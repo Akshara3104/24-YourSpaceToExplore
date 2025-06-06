@@ -16,7 +16,7 @@ const port = 3001
 const {io, server, app} = require('./lib/socket.lib')
 
 const allowedOrigins = [
-  "https://bookverse-jade.vercel.app",
+  "https://nquery-one.vercel.app",
   "http://localhost:3000" 
 ];
 
