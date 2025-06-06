@@ -2,21 +2,21 @@ import React from 'react'
 import { Search } from 'lucide-react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { useGlobalContext } from './GlobalContext'
+import NotLoggedIn from './NotLoggedIn'
 
 
 export default function SearchComponent() {
 
-    const [query, setQuery] = React.useState('')
-    const [searchUsers, setSearchUsers] = React.useState([])
-    const [searchCommunities, setSearchCommunities] = React.useState([])
+    const { query, setQuery, searchUsers, searchCommunities, setSearchUsers, setSearchCommunities } = useGlobalContext()
 
     const navigate = useNavigate()
 
+    const userId = localStorage.getItem('userId')
+
     const searchFunction = async ()=>{
         try {
-            console.log(query)
             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/user/search`, { query })
-            console.log(res.data.users, res.data.communities)
             setSearchUsers(res.data.users)
             setSearchCommunities(res.data.communities)
         } catch (error) {
@@ -24,62 +24,116 @@ export default function SearchComponent() {
         }
     }
 
-    const SearchRender = ({users, communities})=>{
-        return(
-            <div className=''>
-                <div className='fs-3'>People</div>
-                {users.map((user, index) => (
-                    <div
-                    key={index}
-                    className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
-                    onClick={()=>navigate(`/nquery/${user.name}/profile`, 
-                        {state:{ targetId: user._id }})}
-                    >
-                    <div className="relative">
-                        <img
-                        src={user.profilePicture}
-                        alt="Profile"
-                        className="w-10 h-10 rounded-full"
-                        />
-                    </div>
-                    <span className="text-sm font-medium">{user.name}</span>
-                    </div>
-                ))}
-                <div className='fs-3'>Communities</div>
-                {communities.map((community, index) => (
-                    <div
-                    key={index}
-                    className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
-                    // onClick={()=>navigate(`/nquery/messages/${friend._id}`, 
-                    //     {state:{targetName: friend.name, targetProfilePicture: friend.profilePicture}})}
-                    >
-                    <div className="relative">
-                        <img
-                        src={community.image}
-                        alt="Profile"
-                        className="w-10 h-10 rounded-full"
-                        />
-                    </div>
-                    <span className="text-sm font-medium">{community.title}</span>
-                    </div>
-                ))}
+
+    const SearchRender = ({ users, communities }) => {
+        const [activeTab, setActiveTab] = React.useState('people');
+
+        return (
+            <div className="p-3 w-full max-w-xl overflow-y-auto tailwind-scrollbar-hide scrollbarNone">
+            <div className="flex justify-center gap-4 mb-4">
+                <div className="flex justify-center p-4 mt-2 cursor-pointer" onClick={() => setActiveTab('people')}>
+                    <h2 className={`text-2xl font-semibold relative ${activeTab==='people' && 'underline-orange'}`}>
+                        People
+                    </h2>
+                </div>
+                <div className="flex justify-center p-4 mt-2 cursor-pointer" onClick={() => setActiveTab('communities')}>
+                    <h2 className={`text-2xl font-semibold relative ${activeTab==='communities' && 'underline-orange'}`}>
+                        Communities
+                    </h2>
+                </div>
             </div>
+
+            {activeTab === 'people' && (
+                <>
+                {users.length > 0 ? users.map((user, index) => (
+                    <div
+                        key={index}
+                        className="flex items-start gap-4 p-4 bg-neutral-800 hover:bg-gradient-to-r from-orange-500 to-red-500 rounded-xl shadow-md cursor-pointer transition my-2 hover:scale-105"
+                        onClick={() => {
+                            if(userId!==user._id){
+                            navigate(`/nquery/${user.name}/profile`, {
+                            state: { targetId: user._id }
+                        })}}}
+                    >
+                        {/* Profile Image */}
+                        <img
+                            src={user.profilePicture || '/images/DefaultProfile.jpg'}
+                            alt="Profile"
+                            className="w-14 h-14 rounded-full object-cover"
+                        />
+
+                        {/* Text Content */}
+                        <div className="flex flex-col">
+                            <span className="text-lg font-semibold text-white">{user.name}</span>
+                            <p className="text-sm line-clamp-2 max-w-md">
+                            {user.bio || "This user hasn’t added a bio yet."}
+                            </p>
+                        </div>
+                    </div>
+                )) : <div className="text-gray-400">No users found.</div>}
+                </>
+            )}
+
+            {/* Communities Section */}
+            {activeTab === 'communities' && (
+                <>
+                {communities.length > 0 ? communities.map((community, index) => (
+                    <div
+                        key={index}
+                        className="flex items-start gap-4 p-4 bg-neutral-800 hover:bg-gradient-to-r from-orange-500 to-red-500 rounded-xl shadow-md cursor-pointer transition my-2 hover:scale-105"
+                        onClick={() => navigate(`/nquery/community/${community._id}`, {
+                        state: { communityId: community._id }
+                        })}
+                    >
+                        {/* Profile Image */}
+                        <img
+                            src={community.image}
+                            alt="Community"
+                            className="w-14 h-14 rounded-full object-cover"
+                        />
+
+                        {/* Text Content */}
+                        <div className="flex flex-col">
+                            <span className="text-lg font-semibold text-white">{community.title}</span>
+                            <p className="text-sm line-clamp-2 max-w-md">
+                            {community.description || "This user hasn’t added a bio yet."}
+                            </p>
+                        </div>
+                    </div>
+                )) : <div className="text-gray-400">No communities found.</div>}
+                </>
+            )}
+            </div>
+        );
+    };
+
+    if(!userId){
+        return(
+            <NotLoggedIn />
         )
     }
 
+
     return (
-        <div className='p-4'>
-            <div className='p-4 d-flex gap-2'>
+        <div className="section h-full w-full flex flex-col items-center justify-start p-6">
+            <div className="flex gap-2 w-full max-w-xl justify-center">
                 <input 
-                    className='p-2 w-25'
-                    type='text'
-                    placeholder='Search for users, communities'
+                    className="p-2 ps-4 w-full bg-neutral-600 text-white outline-none rounded-md"
+                    type="text"
+                    placeholder="Search for users, communities"
                     value={query}
-                    onChange={(e)=>setQuery(e.target.value)}
+                    onChange={(e) => setQuery(e.target.value)}
                 />
-                <Search onClick={()=>searchFunction()} className='p-2 rounded bg-slate-400 w-10 h-10'/>
+                <Search 
+                    onClick={() => searchFunction()} 
+                    className="p-2 rounded bg-gradient-to-r from-orange-500 to-red-500 w-10 h-10 cursor-pointer" 
+                />
             </div>
-            <SearchRender users={searchUsers} communities={searchCommunities} />
+
+            <SearchRender 
+                users={searchUsers} 
+                communities={searchCommunities} 
+            />
         </div>
     )
 }

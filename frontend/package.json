@@ -8,6 +8,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@mui/icons-material": "^7.1.0",
+    "@tailwindcss/line-clamp": "^0.4.4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
@@ -21,8 +22,11 @@
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0",
     "react-scripts": "5.0.1",
+    "react-select": "^5.10.1",
+    "react-toastify": "^11.0.5",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
+    "styled-components": "^6.1.18",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

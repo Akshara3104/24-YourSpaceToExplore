@@ -2,6 +2,7 @@
 const PostModel = require('../models/post.model');
 const UserModel = require('../models/user.model');
 const CommunityModel = require('../models/community.model')
+const NotificationModel = require('../models/notification.model')
 const mongoose = require('mongoose');
 
 exports.follow = async (req, res)=>{
@@ -9,7 +10,7 @@ exports.follow = async (req, res)=>{
         const { userId, targetId } = req.body;
 
         if(userId===targetId){
-            return res.status(400).json({ success: false, message: "You cannot follow yourself" })
+            return res.status(400).json({ success: false, message: "Invalid request" })
         }
 
         await UserModel.findByIdAndUpdate(userId, { $addToSet: { following: targetId } });
@@ -29,7 +30,7 @@ exports.unfollow = async (req, res)=>{
         const { userId, targetId } = req.body;
 
         if(userId===targetId){
-            return res.status(400).json({ success: false, message: "You cannot unfollow yourself" })
+            return res.status(400).json({ success: false, message: "Invalid request" })
         }
 
         await UserModel.findByIdAndUpdate(userId, { $pull: { following: targetId } });
@@ -39,44 +40,7 @@ exports.unfollow = async (req, res)=>{
         return res.status(200).send({success: true, message: 'Unfollowed'})
 
     }catch(error){
-        console.log(error.message)
         return res.status(400).send({success: false, message: 'Error occured' })
-    }
-}
-
-
-exports.getFollowers = async (req, res)=>{
-
-    try {
-        const {userId} = req.body
-        const followers = await UserModel.findById(userId)
-            .populate({
-                path: 'followers',
-                select: 'name email profilePicture' // Fetch specific details
-            })
-            .select('followers');
-
-        return res.status(200).json({success: true, message: 'Followers fetched', followers: followers.followers})
-    } catch (error) {
-        return res.status(400).json({success: false, message: 'Error'})   
-        
-    }
-}
-
-exports.getFollowing = async (req, res)=>{
-
-    try {
-        const {userId} = req.body
-        const following = await UserModel.findById(userId)
-                .populate({
-                    path: 'following',
-                    select: 'name email profilePicture' // Fetch specific details
-                })
-                .select('following');
-
-        return res.status(200).json({success: true, message: 'Following fetched', following: following.following})
-    } catch (error) {
-        return res.status(400).json({success: false, message: 'Error'})   
     }
 }
 
@@ -85,8 +49,6 @@ exports.getMyProfile = async (req, res) => {
     try {
         const { userId } = req.body;
 
-        console.log('from', userId)
-
         const userProfile = await UserModel.aggregate([
             {
                 $match: { _id: new mongoose.Types.ObjectId(userId) } // Find the user
@@ -94,14 +56,19 @@ exports.getMyProfile = async (req, res) => {
             {
                 $addFields: {
                     followerCount: { $size: "$followers" },
-                    followingCount: { $size: "$following" }
+                    followingCount: { $size: "$following" },
+                    communitiesCount: { $size: "$communitiesJoined" }
                 }
             },
             {
                 $lookup: {
-                    from: "posts", // Reference to posts collection
-                    localField: "_id",
-                    foreignField: "userId",
+                    from: "posts",
+                    let: { userId: "$_id" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$userId", "$$userId"] } } },
+                        { $sort: { createdAt: -1 } },
+                        { $project: { _id: 1, image: 1, caption: 1, createdAt: 1 } }
+                    ],
                     as: "posts"
                 }
             },
@@ -113,7 +80,8 @@ exports.getMyProfile = async (req, res) => {
                     careerInterests: 1,
                     followerCount: 1,
                     followingCount: 1,
-                    posts: { _id: 1, image: 1, caption: 1, createdAt: 1 } // Return only required fields
+                    communitiesCount: 1,
+                    posts: { _id: 1, image: 1, caption: 1, createdAt: 1 }
                 }
             }
         ]);
@@ -125,7 +93,6 @@ exports.getMyProfile = async (req, res) => {
         return res.status(200).json({ success: true, userProfile: userProfile[0] });
 
     } catch (error) {
-        console.error(error);
         return res.status(500).json({ success: false, message: "Server error" });
     }
 };
@@ -140,7 +107,7 @@ exports.getUserProfile = async (req, res)=>{
 
     // Get basic profile info of target user
     const targetUser = await UserModel.findById(targetId)
-      .select('name profilePicture followers following')
+      .select('name profilePicture followers following bio careerInterests communitiesJoined')
       .lean();
 
     if (!targetUser) {
@@ -159,18 +126,21 @@ exports.getUserProfile = async (req, res)=>{
     // Send response
     res.status(200).json({
       userProfile: {
+        _id: targetUser._id,
         name: targetUser.name,
         profilePicture: targetUser.profilePicture,
         followersCount: targetUser.followers.length,
         followingCount: targetUser.following.length,
+        communitiesCount: targetUser.communitiesJoined.length,
         postsCount: posts.length,
         posts,
+        bio: targetUser.bio,
+        careerInterests: targetUser.careerInterests
       },
       isFollowing,
     });
 
   } catch (error) {
-    console.error("Error in getUserProfile:", error);
     res.status(500).json({ message: "Server error" });
   }
 }
@@ -179,32 +149,30 @@ exports.getUserProfile = async (req, res)=>{
 exports.getConnections = async (req, res) => {
 	try {
 		const { targetId, type } = req.body;
-		const targetUser = await UserModel.findById(targetId).populate(type, 'name profilePicture');
-		res.status(200).json({ users: targetUser[type] });
+        if(type==='Communities'){
+
+            const user = await UserModel.findById(targetId).select('communitiesJoined');
+			if (!user) return res.status(404).json({ message: 'User not found' });
+
+			const communities = await CommunityModel.find({
+				_id: { $in: user.communitiesJoined }
+			}).select('title image');
+
+            const users = communities.map(c => ({
+                _id: c._id,
+                name: c.title,
+                profilePicture: c.image
+            }));
+
+            res.status(200).json({ success: true, message: 'Communities fetched successfully', users })
+        }else{
+		    const targetUser = await UserModel.findById(targetId).populate(type.toLowerCase(), 'name profilePicture');
+            res.status(200).json({ success: true, message: 'Users fetched successfully', users: targetUser[type.toLowerCase()] });
+        }
 	} catch (err) {
-		res.status(500).json({ message: "Server error" });
+		res.status(500).json({ success: false, message: "Server error" });
 	}
 };
-
-
-
-
-exports.createPost = async (req, res)=>{
-    try {
-        const {userId, newPost} = req.body;
-        const post = new PostModel({
-            userId,
-            image: newPost.image,
-            caption: newPost.caption
-        })
-
-        await post.save();
-
-        return res.status(200).send({success: true, message: 'New post created'})
-    } catch (error) {
-        return res.status(500).json({ success: false, message: "Server error" });
-    }
-}
 
 
 
@@ -214,16 +182,164 @@ exports.search = async (req, res)=>{
 
         const users = await UserModel.find({
             name: { $regex: query , $options: "i"} 
-        }).select('_id name profilePicture')
+        }).select('_id name profilePicture bio')
 
         const communities = await CommunityModel.find({
             title: { $regex: query , $options: "i"} 
-        }).select('_id title image')
+        }).select('_id title image description')
         
 
         return res.status(200).json({ success: true, message: 'Search results fetched', users, communities })
 
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message })
+    }
+}
+
+
+exports.fetchByTags = async (req, res)=>{
+    try {
+        const {tag} = req.body;
+
+        const users = await UserModel.aggregate([
+            { $match: { careerInterests: { $regex: new RegExp(`^${tag}$`, 'i') } } },
+            {
+                $addFields: {
+                followerCount: { $size: { $ifNull: ["$followers", []] } }
+                }
+            },
+            { $sort: { followerCount: -1 } },
+            { $limit: 50 },
+            {
+                $project: {
+                _id: 1,
+                name: 1,
+                profilePicture: 1,
+                followerCount: 1,
+                bio: 1
+                }
+            }
+        ]);
+
+            
+        const communities = await CommunityModel.aggregate([
+            { $match: { tags: tag } },
+            {
+                $addFields: {
+                    memberCount: { $size: { $ifNull: ["$members", []] } }
+                }
+            },
+            { $sort: { memberCount: -1 } },
+            { $limit: 50 },
+            {
+                $project: {
+                    _id: 1,
+                    title: 1,
+                    description: 1,
+                    image: 1,
+                    memberCount: 1,
+                    description: 1
+                }
+            }
+        ]);
+        
+        return res.status(200).json({ success: true, message: 'Fetched successfully', users, communities })
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message })
+    }
+}
+
+
+exports.toggleFollow =async(req, res)=>{
+    try {
+        const { userId, targetId, isFollowing } = req.body
+
+        const user = await UserModel.findOne({ _id: userId })
+        const targetUser = await UserModel.findOne({ _id: targetId })
+
+        if(isFollowing){
+            user.following.pull(targetId)
+            targetUser.followers.pull(userId)
+        }else{
+            user.following.push(targetId)
+            targetUser.followers.push(userId)
+            const notification = new NotificationModel({
+                userId: targetId,
+                fromId: userId,
+                type: 'follow',
+                profilePicture: user.profilePicture,
+                name: user.name
+            })
+
+            await notification.save()
+        }
+        await user.save()
+        await targetUser.save()
+
+        return res.status(200).json({ success: true, message: 'Toggled Follow', isFollowing: !isFollowing })
+    } catch (error) {
+        console.log(error.message)
+        return res.status(500).json({ success: false, message: error.message })
+    }
+}
+
+
+exports.editProfile = async (req, res)=>{
+    try {
+        const { userId, newData } = req.body
+
+        const user = await UserModel.findOne({_id: userId})
+
+        user.bio=newData.bio
+        user.careerInterests = newData.careerInterests
+        user.profilePicture = newData.profilePicture
+
+        await user.save()
+
+        return res.status(200).json({ success: true, message: 'Profile successfully edited' })
+        
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message })
+        
+    }
+}
+
+
+exports.getNotifications = async(req, res)=>{
+    try {
+        const { userId } = req.body
+        const notifications = await NotificationModel.find({ userId }).sort({createdAt: -1})
+
+        const opened = notifications.filter(item=>item.opened)
+        const notOpened = notifications.filter(item=>!item.opened)
+
+        return res.status(200).json({
+            success: true,
+            opened,
+            notOpened,
+            message: 'Notifications successfully fetched'
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+
+exports.makeAllRead=async(req, res)=>{
+    try {
+        const { userId } = req.body;
+
+        await NotificationModel.updateMany(
+            { userId, opened: false },
+            { $set: { opened: true } }        
+        );
+
+        return res.status(200).json({ success: true, message: "All notifications marked as read." });
+    } catch (error) {
+        console.log(error.message)
+        return res.status(500).json({ success: false, message: "Server error" });
     }
 }

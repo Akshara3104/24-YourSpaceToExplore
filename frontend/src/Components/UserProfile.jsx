@@ -1,12 +1,10 @@
 import React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHeart as solidHeart } from "@fortawesome/free-solid-svg-icons";
-import { faHeart as regularHeart } from "@fortawesome/free-regular-svg-icons";
+import Loader from './Loader';
+import PostModal from './PostModal'
 
 export default function UserProfile() {
-
 
     const location = useLocation()
     const navigate = useNavigate()
@@ -30,7 +28,6 @@ export default function UserProfile() {
     const fetchProfile = async () => {
 		try {
 			const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/user/getUserProfile`, {userId, targetId});
-            console.log(res.data)
 			setUser(res.data.userProfile);
 			setPosts(res.data.userProfile.posts);
             setIsFollowing(res.data.isFollowing)
@@ -45,8 +42,9 @@ export default function UserProfile() {
                 targetId,
                 type,
             });
+            console.log(res.data)
             setModalUsers(res.data.users);
-            setModalTitle(type === "followers" ? "Followers" : "Following");
+            setModalTitle(type);
             setShowConnectionModal(true);
         } catch (err) {
             console.error("Error fetching connections", err);
@@ -54,35 +52,54 @@ export default function UserProfile() {
     };
 
 
+    const handleFollow = async ()=>{
+        try {
+            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/user/toggleFollow`, { userId, targetId, isFollowing })
+            setIsFollowing(res.data.isFollowing)
+        } catch (error) {
+            console.log(error.message)
+        }
+    }
+
+
     React.useEffect(()=>{
         fetchProfile()
-    }, [targetId])
+    }, [targetId, isFollowing])
 
 
     const ConnectionModal = ()=> {
         return(
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="fixed inset-0 w-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-[#161616] rounded-lg p-6 w-1/4 max-h-[80vh] overflow-y-auto">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold">{modalTitle}</h2>
-                        <button onClick={() => setShowConnectionModal(false)} className="text-gray-500 hover:text-black text-xl">&times;</button>
+                        <div className="flex justify-center">
+                            <h2 className="text-xl font-semibold text-center relative underline-orange">
+                                {modalTitle}
+                            </h2>
+                        </div>
+                        <button onClick={() => setShowConnectionModal(false)} className="text-gray-300 hover:text-white text-xl">&times;</button>
                     </div>
+
                     {modalUsers.length === 0 ? (
-                        <p className="text-gray-500 text-center">No users found</p>
+                        <p className="text-gray-400 text-center">No users found</p>
                     ) : (
                         <ul className="space-y-3">
                             {modalUsers.map(item => (
                                 <li 
-                                    key={user._id} 
-                                    className="flex items-center space-x-3 my-3"
-                                    onClick={()=>{
-                                        navigate(`/nquery/${item.name}/profile`, {state:{targetId: item._id}})
-                                        setShowConnectionModal(false)
-                                    }
-                                    }
+                                    key={item._id} 
+                                    className="flex items-center space-x-3 my-3 cursor-pointer hover:bg-gradient-to-r from-orange-500 to-red-500 transition hover:scale-[1.02] p-2 rounded"
+                                    onClick={() => {
+                                        if(modalTitle==='Communities'){
+                                        navigate(`/nquery/community/${item._id}`, { state: { communityId: item._id } });
+                                        }
+                                        else if(item._id !== userId){
+                                        navigate(`/nquery/${item.name}/profile`, { state: { targetId: item._id } });
+                                        }
+                                        setShowConnectionModal(false);
+                                    }}
                                 >
-                                    <img src={item.profilePicture} alt="Profile" className="w-10 h-10 rounded-full object-cover" />
-                                    <span className="text-gray-800 font-medium">{item.name}</span>
+                                    <img src={item.profilePicture || '/images/DefaultProfile.jpg'} alt="Profile" className="w-10 h-10 rounded-full object-cover" />
+                                    <span className="text-white font-medium">{item.name}</span>
                                 </li>
                             ))}
                         </ul>
@@ -93,179 +110,132 @@ export default function UserProfile() {
     }
 
 
-    const PostModal = ({isOpen, post, onClose, user, userId})=>{
-
-        const [newComment, setNewComment] = React.useState('')
-
-        const [comments, setComments] = React.useState([])
-
-        const [liked, setLiked] = React.useState(false)
-        const [likesCount, setLikesCount] = React.useState(0)
-
-        const handleAddComment = async(postId, comment)=>{
-            try {
-                console.log(newComment)
-                const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/post/addComment`, {userId, postId, comment, name, profilePicture})
-                setComments(prev=>[{name, comment: newComment, profilePicture}, ...prev])
-                setNewComment('')
-                console.log(res.data.message)
-            } catch (error) {
-                console.log(error.message)
-            }
-        }
-
-        const getComments = async ()=>{
-            try {
-                const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/post/getComments`, {postId: post._id, userId})
-                setComments(res.data.comments)
-                setLiked(res.data.liked)
-                setLikesCount(res.data.likesCount)
-                console.log(res.data)
-            } catch (error) {
-                return null
-            }
-        }
-
-        const toggleLike = async ()=>{
-            try {
-                const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/post/toggleLike`, {userId, postId: post._id})
-                setLiked(!liked)
-                setLikesCount(res.data.likesCount)
-                console.log(res.data)
-            } catch (error) {
-                return null
-            }
-        }
-
-        React.useEffect(()=>{
-            getComments()
-        }, [])
-
-        if(!isOpen) return null;
-
-        return(
-            <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
-                <div className="bg-white w-11/12 md:w-3/4 lg:w-2/3 h-[90vh] rounded-lg overflow-hidden flex">
-                    <div className="w-1/2 bg-black/30 flex flex-col">
-                        <img src={post.image} alt="Post" className="object-cover h-full w-full p-3" />
-                        <div className="p-4 bg-white">
-                            <FontAwesomeIcon 
-                                icon={liked ? solidHeart:regularHeart} 
-                                onClick={()=>toggleLike()}
-                                className='fs-3'
-                            />
-                            {likesCount} likes
-                            <strong>{user.name}</strong>
-                            <p className="text-sm">{post.caption}</p>
-                            <div className="mt-2 text-sm text-gray-600">
-                            {/* ❤️ {post.likes.length} Likes */}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="w-1/2 p-4 flex flex-col justify-between bg-white">
-                    <div className="overflow-y-auto space-y-3 max-h-[70vh]">
-                        <div className='h5'>Comments</div>
-                        
-                        {comments.map((c, i) => (
-                        <div key={i} className="text-sm border-b pb-2 d-flex">
-                            <img src={c.profilePicture} className='w-10 h-10 rounded-full object-cover mr-3'/>
-                            <div className='d-flex flex-column'>
-                                <strong>{c.name}</strong>
-                                <div className=''>{c.comment}</div>
-                                
-                            </div>
-                        </div>
-                        ))}
-                    </div>
-
-                    <form
-                        className="mt-4 flex"
-                        onSubmit={(e) => {
-                        e.preventDefault();
-                        handleAddComment(post._id, newComment)
-                        }}
-                    >
-                        <input
-                            type="text"
-                            placeholder="Add a comment..."
-                            value={newComment}
-                            onChange={(e)=>setNewComment(e.target.value)}
-                            className="flex-1 border rounded-l px-3 py-2 text-sm"
-                        />
-                        <button className="bg-blue-500 text-white px-4 rounded-r" disabled={newComment===''}>
-                        Post
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            {/* Close Button */}
-            <button onClick={onClose} className="absolute top-4 right-4 text-white text-2xl">&times;</button>
-            </div>
-        )
-    }
-
     if (!user) 
-		return <div className="text-center mt-10 text-gray-500">Loading...</div>;
+		return <div className="w-full h-full d-flex justify-center items-center"><Loader /></div>;
 
 
     return (
-        <div className="max-w-4xl mx-auto p-4">
-            <div className="flex items-center space-x-6">
-                <img src={user.profilePicture} alt="Profile" className="w-24 h-24 rounded-full object-cover border" />
-                <div>
-                    <h2 className="text-2xl font-semibold">{user.name}</h2>
-                    <p className="text-gray-500">{user.bio || "No bio available"}</p>
-                    <div className="flex space-x-4 mt-2">
-                        <span onClick={() => handleShowConnections("followers")} className="cursor-pointer hover:underline">
-                            <strong>{user.followersCount}</strong> Followers
+        <div className="w-full h-full mx-auto p-4 section d-flex flex-column items-center overflow-y-auto">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-8 text-white p-6 rounded-xl">
+                {/* Left: Profile Picture */}
+                <div className="w-40 h-40 flex-shrink-0">
+                    <img
+                    src={user.profilePicture || '/images/DefaultProfile.jpg'}
+                    alt="Profile"
+                    className="w-full h-full object-cover rounded-full border-4 border-zinc-700 shadow-md"
+                    />
+                </div>
+
+                {/* Right: Info Section */}
+                <div className="flex-1">
+                    {/* Name & Bio */}
+                    <div className="mb-2">
+                        <h2 className="text-3xl font-bold">{user.name}</h2>
+                        <p className="text-gray-400">{user.bio || "No bio available"}</p>
+                    </div>
+
+                    {/* Stats: Followers, Following, Posts */}
+                    <div className="flex flex-wrap gap-6 text-gray-300 mb-3">
+                        <div
+                            onClick={() => handleShowConnections("Followers")}
+                            className="cursor-pointer px-2 py-1 rounded-md hover:bg-zinc-800 transition hover:bg-gradient-to-r from-orange-500 to-red-500 "
+                        >
+                            <strong className="text-white text-xl">{user.followersCount}</strong> Followers
+                        </div>
+                        <div
+                            onClick={() => handleShowConnections("Following")}
+                            className="cursor-pointer px-2 py-1 rounded-md hover:bg-zinc-800 transition hover:bg-gradient-to-r from-orange-500 to-red-500 "
+                        >
+                            <strong className="text-white text-xl">{user.followingCount}</strong> Following
+                        </div>
+                        <div
+                            onClick={() => handleShowConnections("Communities")}
+                            className="cursor-pointer px-2 py-1 rounded-md hover:bg-zinc-800 transition hover:bg-gradient-to-r from-orange-500 to-red-500 "
+                        >
+                            <strong className="text-white text-xl">{user.communitiesCount}</strong> communities
+                        </div>
+                        <div className="px-2 py-1 rounded-md">
+                            <strong className="text-white text-xl">{posts.length}</strong> Posts
+                        </div>
+                    </div>
+
+
+                    {/* Buttons */}
+                    <div className="flex flex-wrap gap-4 mb-4">
+                    <button
+                        className="bg-gradient-to-r from-blue-600 to-indigo-800 text-white px-4 py-2 rounded-lg transition"
+                        onClick={() =>
+                        navigate(`/nquery/messages/${targetId}`, {
+                            state: {
+                            targetName: user.name,
+                            targetProfilePicture: user.profilePicture,
+                            },
+                        })
+                        }
+                    >
+                        Message
+                    </button>
+                    {isFollowing ? (
+                        <button
+                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
+                        onClick={handleFollow}
+                        >
+                        Unfollow
+                        </button>
+                    ) : (
+                        <button
+                        className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition"
+                        onClick={handleFollow}
+                        >
+                        Follow
+                        </button>
+                    )}
+                    </div>
+
+                    {/* Career Interests */}
+                    <div className="flex flex-wrap gap-2">
+                    {user.careerInterests.map((item, i) => (
+                        <span
+                        key={i}
+                        className="px-3 py-1 text-sm rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-gray-100"
+                        >
+                        {item}
                         </span>
-                        <span onClick={() => handleShowConnections("following")} className="cursor-pointer hover:underline">
-                            <strong>{user.followingCount}</strong> Following
-                        </span>
-                        <span>
-                            <strong>{posts.length}</strong> Posts
-                        </span>
+                    ))}
                     </div>
                 </div>
             </div>
 
-            <div className='d-flex gap-3 m-3'>
-                <div className='btn btn-primary' onClick={()=>navigate(`/nquery/messages/${targetId}`, {state:{targetName: user.name, targetProfilePicture: user.profilePicture}})}>
-                    Message
-                </div>
-                {
-                    isFollowing ? 
-                    <div className='btn btn-danger'>Unfollow</div> 
-                    : 
-                    <div className='btn btn-info'>Follow</div>
-                }
+            <hr />
+			<div className="flex justify-center">
+                <h2 className="text-2xl font-semibold relative underline-orange">
+                    Posts
+                </h2>
             </div>
-
-			<div className="h4 my-2">Posts</div>
             
-			<div className="mt-6 grid grid-cols-3 gap-4">
-				{posts.map((post) => (
-					<div 
-                        key={post._id} 
-                        className="relative bg-gray-900 rounded-lg overflow-hidden shadow-md"
-                        onClick={()=>setSelectedPost(post)}
-                    >
-						<div className="w-full aspect-square overflow-hidden">
-							<img 
-								src={post.image} 
-								alt="Post" 
-								className="w-full h-full object-cover"
-							/>
-						</div>
+            <div className='w-2/3  h-full'>
+                <div className="my-6 grid grid-cols-3 gap-4">
+                    {posts.map((post) => (
+                        <div 
+                            key={post._id} 
+                            className="relative bg-gray-900 rounded-lg overflow-hidden shadow-md cursor-pointer"
+                            onClick={()=>setSelectedPost(post)}
+                        >
+                            <div className="w-full aspect-square overflow-hidden">
+                                <img 
+                                    src={post.image} 
+                                    alt="Post" 
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
 
-						<div className="w-full text-center text-white bg-black/70 py-2">
-							{post.caption}
-						</div>
-					</div>
-				))}
-			</div>
+                            <div className="w-full text-center text-white bg-black/70 py-2">
+                                {post.caption}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
 
             { showConnectionModal && <ConnectionModal /> }
             
@@ -276,6 +246,9 @@ export default function UserProfile() {
                 onClose={() => setSelectedPost(null)} 
                 user={user}
                 userId={userId}
+                name={name}
+                profilePicture={profilePicture}
+                type='user'
             />
 
         </div>

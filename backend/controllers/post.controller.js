@@ -3,21 +3,45 @@ const mongoose = require('mongoose')
 
 const PostModel = require('../models/post.model')
 const CommentModel = require('../models/comment.model')
+const UserModel = require('../models/user.model')
+const CommunityPostModel = require('../models/communityPost.model')
+const NotificationModel = require('../models/notification.model')
 
-exports.createPost = async (req, res)=>{
+exports.createUserPost = async (req, res)=>{
     try {
         
-        const { userId, image, caption, tags, likes } = req.body
+        const { userId, newPost  } = req.body
 
-        const newPost = new PostModel({
+        const post = new PostModel({
             userId,
-            image,
-            caption,
-            tags: tags || [],
-            likes: []
+            image: newPost.image,
+            caption: newPost.caption,
         })
 
-        await newPost.save()
+        await post.save()
+
+        return res.status(200).json({ success: true, message: 'Post successfully ' })
+
+    } catch (error) {
+
+        return res.status(400).json({ success: false, message: 'Error occured'})
+        
+    }
+}
+
+
+exports.createCommunityPost = async (req, res)=>{
+    try {
+        
+        const { communityId, newPost  } = req.body
+
+        const post = new CommunityPostModel({
+            communityId,
+            image: newPost.image,
+            caption: newPost.caption,
+        })
+
+        await post.save()
 
         return res.status(200).json({ success: true, message: 'Post successfully ' })
 
@@ -40,20 +64,44 @@ exports.getPosts = async (req, res)=>{
         
     } catch (error) {
         return res.status(500).json({ success: false, message: 'Error occured' })
+    }
+}
+
+
+exports.getCommunityPosts = async(req, res)=>{
+    try {
+        const { communityId } = req.body
+        
+        const posts = await CommunityPostModel.find({ communityId: communityId })
+        
+        return res.status(200).json({ success: true, posts, message: 'Community posts fetched' })
+    } catch (error) {
+        return res.status(500).json({ success: false, message: 'Error occured' })
         
     }
 }
 
 
-
-exports.getComments = async (req, res)=>{
+exports.getCommentsLikes = async (req, res)=>{
     try {
-        const { postId, userId } = req.body
+        const { postId, userId, type } = req.body
         const comments = await CommentModel.find({postId}).sort({createdAt: -1})
-        const post = await PostModel.findOne({_id: postId})
+
+        let post=null
+        if(type==='user'){
+            post = await PostModel.findOne({_id: postId})
+        }
+        else{
+            post = await CommunityPostModel.findOne({_id: postId})
+        }
+
+        const likedBy = await UserModel.find(
+            {_id: {$in: post.likes }},
+            { name:1, profilePicture:1 }
+        )
         const liked = post.likes.some(id => id.equals(userId));
         const likesCount = post.likes.length
-        return res.json({ success: true, comments, liked, likesCount, message: 'Comments fetched successfully' })
+        return res.json({ success: true, comments, liked, likesCount, likedBy, message: 'Likes and Comments fetched successfully' })
     } catch (error) {
         return res.status(500).json({ success: false, message: "Error occured" })
     }
@@ -61,11 +109,25 @@ exports.getComments = async (req, res)=>{
 
 exports.addComment = async (req, res)=>{
     try {
-        const { postId, userId, comment, name, profilePicture } = req.body
+        const { postId, userId, comment, name, profilePicture, fromId } = req.body
         
         const newComment = new CommentModel({postId, userId, name, profilePicture, comment})
         
         await newComment.save()
+
+        console.log(fromId)
+        const notification = new NotificationModel({
+            userId: fromId,
+            type: 'comment',
+            comment,
+            fromId: userId,
+            profilePicture,
+            name
+        })
+
+        await notification.save()
+
+        console.log(notification)
         
         return res.status(200).json({ success: true, message: 'Comment added' })
     } catch (error) {
@@ -77,20 +139,55 @@ exports.addComment = async (req, res)=>{
 
 exports.toggleLike = async (req, res)=>{
     try {
-        const { postId, userId } = req.body
-        const post = await PostModel.findOne({_id: postId})
+        const { postId, userId, type, fromId, name, profilePicture } = req.body
+
+        let post=null
+        if(type==='user'){
+            post = await PostModel.findOne({_id: postId})
+        }
+        else{
+            post = await CommunityPostModel.findOne({_id: postId})
+        }
         if(!post){
-            console.log('No post')
             return null
         }
         const liked = post.likes.some(id=>id.equals(userId))
         if(liked)   post.likes.pull(userId)
-        else    post.likes.push(userId)
+        else{
+            post.likes.push(userId)
+            if(type==='user'){
+                const notification = new NotificationModel({
+                    userId: fromId,
+                    type: 'like',
+                    fromId: userId,
+                    profilePicture,
+                    name
+                })
+
+                await notification.save()
+            }
+        }
         await post.save()
         return res.status(200).json({ success: true, message: 'Liked toggled', likesCount: post.likes.length })
-        // return res.status(200).json({ success: true, message: 'emo' })
     } catch (error) {
-        console.log(error.message)
+        return res.status(500).json({ success: false, message: error.message })
+    }
+}
+
+
+exports.deletePost = async(req, res)=>{
+    try {
+        const { postId, type } = req.body
+
+        if(type==='user'){
+            await PostModel.deleteOne({_id: postId})
+        }else{
+            await CommunityPostModel.deleteOne({_id: postId})
+        }
+        await CommentModel.deleteMany({postId})
+
+        return res.status(200).json({ success: true, message: 'Post deleted' })
+    } catch (error) {
         return res.status(500).json({ success: false, message: error.message })
     }
 }

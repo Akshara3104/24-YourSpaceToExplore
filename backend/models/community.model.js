@@ -13,7 +13,7 @@ const CommunitySchema = new mongoose.Schema({
     },
     image: {
         type: String,
-        default: "Image.png"
+        default: ""
     },
     tags: [{
         type: String,
@@ -21,20 +21,16 @@ const CommunitySchema = new mongoose.Schema({
     }],
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "user",  // Reference to User model
+        ref: "user",
         required: true,
     },
     members: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "user",  // List of community members (Users)
+            ref: "user",
         }
     ],
-    isPrivate: {
-        type: Boolean,
-        default: false,  // Public by default
-    }
-}, { timestamps: true }); // Auto adds createdAt & updatedAt
+}, { timestamps: true });
 
 const CommunityModel = mongoose.model("Community", CommunitySchema);
 

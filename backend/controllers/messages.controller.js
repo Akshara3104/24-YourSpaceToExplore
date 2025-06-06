@@ -75,7 +75,6 @@ exports.getPeople = async (req, res) => {
 
         return res.status(200).json({ success: true, message: "Fetched", recentChats });
     } catch (error) {
-        console.error("Error fetching recent chats:", error);
         res.status(500).json({ success: false, message: "Error" });
     }
 };
@@ -90,7 +89,18 @@ exports.getMessages = async (req, res)=>{
 
         const messages = await MessagesModel.find({ conversationId })
 
-        res.status(200).json({success: true, messages})
+        const groups = {};
+
+        messages.forEach(msg => {
+            const date = new Date(msg.createdAt).toLocaleDateString("en-GB", {
+                day: "numeric", month: "short", year: "numeric"
+            });
+
+            if (!groups[date]) groups[date] = [];
+            groups[date].push(msg);
+        });
+
+        res.status(200).json({success: true, messages: groups})
     } catch (error) {
         res.status(400).json({success: false, message: 'Error occured'})
     }

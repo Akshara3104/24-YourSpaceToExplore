@@ -1,26 +1,26 @@
 
 
-const { default: mongoose } = require('mongoose')
+const { mongoose } = require('mongoose')
 const CommunityModel = require('../models/community.model')
 const UserModel = require('../models/user.model')
 
 
 const { io } = require('../lib/socket.lib')
 const CommunityMessagesModel = require('../models/communityMessages.mode')
+const CommunityPostModel = require('../models/communityPost.model')
 
 
 exports.createCommunity = async (req, res)=>{
     try {
         
-        const {title, description, image, tags, createdBy, isPrivate} = req.body
+        const { newCommunity, createdBy } = req.body
 
         const community = new CommunityModel({
-            title,
-            description,
-            image,
-            tags: tags||[],
-            createdBy,
-            isPrivate,
+            title: newCommunity.title,
+            image: newCommunity.image,
+            description: newCommunity.description,
+            createdBy: createdBy,
+            tags: newCommunity.tags,
             members: [createdBy]
         })
 
@@ -35,10 +35,7 @@ exports.createCommunity = async (req, res)=>{
         return res.status(200).json({success: true, message: "Community created successfully", communityId: community._id})
 
     } catch (error) {
-
-        console.log('Error occured while creating community')
         return res.status(500).json({success: false, message: "Error occured while creaating community"})
-        
     }
 }
 
@@ -75,17 +72,19 @@ exports.getCommunities = async (req, res)=>{
     }
 }
 
-
-
-exports.getAllCommunities = async (req, res)=>{
+exports.getCommunityDetails = async (req, res)=>{
     try {
-        
-        const communities = await CommunityModel.find().select('_id title')
+        const { communityId, userId } = req.body
 
-        return res.status(200).json({success: true, message: 'fetched', communities})
+        const community = await CommunityModel.findOne({ _id: communityId })
 
+        const posts = await CommunityPostModel.find({ communityId: communityId }).sort({ createdAt:-1 })
+
+        const isJoined = community.members.includes(userId)
+
+        return res.status(200).json({ success: true, community, posts, isJoined, message: 'Community fetched' })
     } catch (error) {
-        return res.status(500).json({ success: false, message: 'Error'})
+        return res.status(500).json({ success: false, message: error.message })
     }
 }
 
@@ -121,42 +120,94 @@ exports.joinCommunity = async (req, res) => {
         return res.status(200).json({ success: true, message: 'Joined community successfully', community });
 
     } catch (error) {
-        console.error('Error joining community:', error);
+        return res.status(500).json({ success: false, message: 'An error occurred', error: error.message });
+    }
+}
+
+exports.toggleJoin = async(req, res)=>{
+    try {
+        const { communityId, userId, joined } = req.body
+        const community = await CommunityModel.findOne({ _id: communityId });
+        const user = await UserModel.findOne({ _id: userId });
+
+        if (!community || !user) {
+        return res.status(404).json({ success: false, message: "Community or user not found" });
+        }
+
+        if (!joined) {
+            if (!community.members.includes(userId)) {
+                community.members.push(userId);
+            }
+
+            if (!user.communitiesJoined.includes(communityId)) {
+                user.communitiesJoined.push(communityId);
+            }
+
+            await community.save();
+            await user.save();
+
+            return res.status(200).json({ success: true, message: "Joined community successfully" });
+
+        } else {
+            community.members = community.members.filter(
+                (memberId) => memberId.toString() !== userId.toString()
+            );
+
+            user.communitiesJoined = user.communitiesJoined.filter(
+                (joinedId) => joinedId.toString() !== communityId.toString()
+            );
+
+            await community.save();
+            await user.save();
+
+            return res.status(200).json({ success: true, message: "Left community successfully" });
+        }
+    } catch (error) {
         return res.status(500).json({ success: false, message: 'An error occurred', error: error.message });
     }
 }
 
 
 
-exports.getMembers = async (req, res)=>{
+exports.getMembers = async (req, res) => {
     try {
-        
-        const { communityId } = req.body
+        const { communityId } = req.body;
 
-        if(!mongoose.Types.ObjectId.isValid(communityId)){
-            return res.status(400).json({success: false, message: "Invalid user"})
+        if (!mongoose.Types.ObjectId.isValid(communityId)) {
+            return res.status(400).json({ success: false, message: "Invalid community ID" });
         }
 
         const community = await CommunityModel.findById(communityId)
-                                    .populate({
-                                        path: 'members',
-                                        select: 'name _id image'
-                                    })
+            .populate([
+                {
+                    path: 'createdBy',
+                    select: 'name _id profilePicture'
+                },
+                {
+                    path: 'members',
+                    select: 'name _id profilePicture'
+                }
+            ]);
+
+        const filteredMembers = community.members.filter(
+            (member) => member._id.toString() !== community.createdBy._id.toString()
+        );
 
         return res.status(200).json({
-            success: true, 
-            message: 'Members fetched successfully', 
-            members: community.members
-        })
+            success: true,
+            message: 'Fetched successfully',
+            createdBy: community.createdBy,
+            members: filteredMembers
+        });
 
     } catch (error) {
-        console.log(error.message)
         return res.status(500).json({
-            success: false, 
-            message: 'Error occured'
-        })
-    }   
-}
+            success: false,
+            message: 'Server error'
+        });
+    }
+};
+
 
 
 exports.getMessages = async (req, res)=>{
@@ -168,23 +219,16 @@ exports.getMessages = async (req, res)=>{
                 select: 'name profilePicture'
             })
             .sort({ createdAt: 1 })
-            // .skip((page - 1) * limit)
-            // .limit(parseInt(limit));
-
-        if (!messages.length) {
-            return res.status(404).json({ success: false, message: 'No messages found' });
-        }
 
         res.status(200).json({
             success: true,
             messages,
-            // currentPage: page,
-            // totalMessages: await CommunityMessagesModel.countDocuments({ communityId })
         });
     } catch (error) {
         res.status(400).json({success: false, message: 'Error occured'})
     }
 }
+
 
 
 io.on("connection", (socket) => {
@@ -205,6 +249,6 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", () => {
-        // console.log("User disconnected:", socket.id);
+        console.log("User disconnected:", socket.id);
     });
 });

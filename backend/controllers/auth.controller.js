@@ -6,10 +6,9 @@ exports.register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
         const exists = await UserModel.findOne({ email });
-
-        console.log(name, email)
+        const nameExists = await UserModel.findOne({ name });
         
-        if (!exists) {
+        if (!exists && !nameExists) {
             const hashPwd = await bcrypt.hash(password, 10)
             const user = await UserModel.create({ name, email, password: hashPwd });
             const token = jwt.sign({ id: user._id.toString() }, "JWT_SECRET");

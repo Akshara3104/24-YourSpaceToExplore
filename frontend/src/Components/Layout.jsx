@@ -1,87 +1,77 @@
 import axios from 'axios'
 import React from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
-import { Book, House, MessageCircle, Users, Search, Settings, UsersRound, LogOut } from 'lucide-react'
+import { House, MessageCircle, Tag, Users, Search, LogOut, Bell } from 'lucide-react'
+import NotLoggedIn from './NotLoggedIn'
+import { ToastContainer } from 'react-toastify'
 
 
 export default function Layout() {
 
 
-  const userId = localStorage.getItem('userId')
-  const name = localStorage.getItem('name')
-  const token = localStorage.getItem('token')
-  const profilePicture = localStorage.getItem('profilePicture')
+    const userId = localStorage.getItem('userId')
+    const name = localStorage.getItem('name')
+    const token = localStorage.getItem('token')
+    const profilePicture = localStorage.getItem('profilePicture')
 
-  const navigate = useNavigate()
+    const navigate = useNavigate()
 
-  const logout = ()=>{
-    localStorage.removeItem('userId')
-    localStorage.removeItem('name')
-    localStorage.removeItem('token')
-    localStorage.removeItem('profilePicture')
-    navigate('/')
-  }
+    const logout = ()=>{
+        localStorage.removeItem('userId')
+        localStorage.removeItem('name')
+        localStorage.removeItem('token')
+        localStorage.removeItem('profilePicture')
+        navigate('/')
+    }
 
+    if(!userId){
+        return(
+            <div className='h-screen p-4 bg-black'>
+                <NotLoggedIn />
+            </div>
+        )
+    }
 
-  const handleFile = async (event)=>{
-
-    const file = event.target.files[0]
-    if(!file) return 
-    console.log(file)
-
-    const data = new FormData()
-
-    data.append('file', file)
-    data.append('upload_preset', 'nquery')
-    data.append('cloud_name', 'ddjqda8cb')
-
-    const res = await axios.post('https://api.cloudinary.com/v1_1/ddjqda8cb/image/upload', data)
-
-    console.log(res.data.url)
-
-  }
-
-  return (
-    <div className='vh-100 bg-slate-400 d-flex'>
-      <div className='w-20 m-2 my-2 d-flex flex-column justify-between'>
-        <div className='m-2 mx-auto d-flex flex-column gap-3'>
-          <div className='w-fit p-2 cursor-pointer' onClick={()=>navigate('/nquery')}>
-            <House />
-          </div>
-          <div className='m-2 cursor-pointer' onClick={()=>navigate('/nquery/messages')}>
-            <MessageCircle />
-          </div>
-          <div className='m-2 cursor-pointer' onClick={()=>navigate('/nquery/communities')}>
-            <Users />
-          </div>
-          <div className='m-2 cursor-pointer' onClick={()=>navigate('/nquery/allcommunities')}>
-            <UsersRound />
-          </div>
-          <div className='m-2 cursor-pointer' onClick={()=>navigate('/nquery/search')}>
-            <Search />
-          </div>
+    return (
+    <div className='vh-100 bg-black d-flex'>
+        <div className='w-20 m-3 d-flex flex-column justify-center section border-radius py-3'>
+        <div className='m-2 mx-auto d-flex flex-column gap-3 items-center'>
+            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/nquery')}>
+                <House />
+            </div>
+            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/nquery/messages')}>
+                <MessageCircle />
+            </div>
+            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/nquery/communities')}>
+                <Users />
+            </div>
+            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/nquery/search')}>
+                <Search />
+            </div>
+            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/nquery/explore')}>
+                <Tag />
+            </div>
+            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/nquery/notifications')}>
+                <Bell />
+            </div>
+            <div className='w-fit p-2 cursor-pointer rounded hover:bg-neutral-600' onClick={()=>logout()}>
+                <LogOut />
+            </div>
+            <img  
+                src={profilePicture || '/images/DefaultProfile.jpg'} 
+                alt='No photo' 
+                className='w-12 h-12 rounded-full cursor-pointer mb-2'
+                spellCheck={false}
+                onClick={()=>navigate('/nquery/me/profile')}
+            />
         </div>
-        <div className='d-flex flex-column gap-3 justify-between align-items-center'>
-          <div className='m-2 cursor-pointer'>
-            <Settings />
-          </div>
-          <div className='m-2 cursor-pointer' onClick={()=>logout()}>
-            <LogOut />
-          </div>
-          <img  
-            src={profilePicture} 
-            alt='No photo' 
-            className='w-10 rounded-full m-2'
-            onClick={()=>navigate('/nquery/me/profile')}
-          />
         </div>
-      </div>
 
 
-      <div className='bg-slate-300 w-full overflow-y-scroll overflow-hidden outlet flex-1'>
+        <div className='w-full my-3 me-3 overflow-y-scroll outlet flex-1'>
         <Outlet />
-      </div>
-
+        </div>
+        <ToastContainer />
     </div>
-  )
+    )
 }

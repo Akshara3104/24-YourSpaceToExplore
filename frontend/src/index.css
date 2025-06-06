@@ -3,17 +3,99 @@
 @tailwind utilities;
 
 *{
-    font-family: 'Jost', sans-serif;
+    font-family: 'Karla', sans-serif;
+    color: white;
 }
 
 .outlet {
-    overflow: auto; /* Enable scrolling */
+    overflow: auto;
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE/Edge */
-  }
-  
-  /* Hide scrollbar for WebKit browsers (Chrome, Safari) */
+}
+
+/* Hide scrollbar for WebKit browsers (Chrome, Safari) */
 .outlet::-webkit-scrollbar {
     display: none;
-  }
-  
+}
+
+
+.section{
+    background-color: #161616;
+    border-radius: 10px;
+}
+
+
+.commTitle{
+    box-shadow: 5px 5px 5px white;
+}
+
+.inp{
+    background-color: #161616;
+}
+
+.underline-orange::after {
+    content: "";
+    position: absolute;
+    bottom: -6px; /* Adjust spacing below text */
+    left: 10%;
+    width: 80%;
+    height: 3px;
+    background: linear-gradient(to right, #f97316, #ef4444);
+    border-radius: 2px;
+}
+
+.noSelect{
+    user-select: none;
+}
+
+.textColor{
+    color: linear-gradient(to right, #f97316, #ef4444);
+}
+
+.scrollbarNone::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbarNone {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+
+.react-select-container {
+background-color: #525252; /* Tailwind's bg-neutral-600 */
+color: white;
+}
+.react-select__control {
+background-color: #525252;
+border-color: #404040;
+}
+.react-select__menu {
+background-color: #525252;
+color: white;
+}
+.react-select__option--is-focused {
+background-color: #404040;
+}
+.react-select__multi-value {
+background-color: #3f3f3f;
+}
+
+
+
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #7f7e7e58;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #88888863;
+}

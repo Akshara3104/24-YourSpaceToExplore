@@ -3,9 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose')
 
-// mongoose.connect('mongodb+srv://abhivardhan:abhivardhan@cluster0.vrhaf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
-
-mongoose.connect('mongodb://localhost:27017/NQuery')
+mongoose.connect('mongodb+srv://abhivardhan:abhivardhan@cluster0.vrhaf.mongodb.net/nquery?retryWrites=true&w=majority&appName=Cluster0')
 
 const authRoutes = require('./routes/auth.routes')
 const userRoutes = require('./routes/user.routes')
@@ -16,7 +14,20 @@ const port = 3001
 
 const {io, server, app} = require('./lib/socket.lib')
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+const allowedOrigins = [
+  "https://bookverse-jade.vercel.app",
+  "http://localhost:3000" 
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true, 
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json())
 
 app.use('/auth', authRoutes)

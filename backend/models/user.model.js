@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema({
     },
     profilePicture: {
         type: String,
-        default: "default-avatar.png", // Can be stored on Cloudinary or Firebase
+        default: "",
     },
     bio: {
         type: String,
@@ -28,25 +28,13 @@ const UserSchema = new mongoose.Schema({
     careerInterests: [
         {
             type: String,
-            trim: true, // Example: ["Marketing", "Law", "Design"]
+            trim: true, 
         },
     ],
     communitiesJoined: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Community",
-        },
-    ],
-    mentors: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "user", // Users who are mentors
-        },
-    ],
-    mentees: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "user", // Users being mentored
         },
     ],
     followers: [
@@ -61,30 +49,6 @@ const UserSchema = new mongoose.Schema({
             ref: "user",
         },
     ],
-    messages: [
-        {
-            sender: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-            receiver: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-            content: String,
-            timestamp: { type: Date, default: Date.now },
-        },
-    ],
-    notifications: [
-        {
-            message: String,
-            isRead: { type: Boolean, default: false },
-            createdAt: { type: Date, default: Date.now },
-        },
-    ],
-    settings: {
-        privacy: {
-            showProfileToPublic: { type: Boolean, default: true },
-        },
-        notifications: {
-            emailNotifications: { type: Boolean, default: true },
-            pushNotifications: { type: Boolean, default: true },
-        },
-    },
     },
     { timestamps: true }
 )
