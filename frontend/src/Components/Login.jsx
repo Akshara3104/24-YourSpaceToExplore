@@ -27,7 +27,7 @@ export default function Login() {
 
     const handleSubmit = async (e)=>{
         e.preventDefault()
-        axios.post(`http://localhost:3001/auth/login`, {data})
+        axios.post(`${process.env.REACT_APP_BACKEND_URL}/auth/login`, {data})
             .then(res=>{
                 if(res.data.success){
                     localStorage.setItem('token', res.data.token)
