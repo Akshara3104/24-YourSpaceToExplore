@@ -103,7 +103,7 @@ export default function MyProfile() {
     const NewPostModal = ()=>{
 
         const [newPost, setNewPost] = React.useState({
-            image: '',
+            image: null,
             caption: ''
         });
 
@@ -111,10 +111,6 @@ export default function MyProfile() {
 
         const createNewPost = async ()=>{
             try {
-                if(newPost.image===''){
-                    toast('Please select an image', toastSettings);
-                    return
-                }
                 const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/post/createUserPost`, {userId, newPost});
                 toast('Post successful, Please refresh the page', toastSettings);
                 setTimeout(()=>{

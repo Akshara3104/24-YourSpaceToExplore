@@ -73,7 +73,10 @@ const PostModal = ({ isOpen, post, onClose, user, userId, name, profilePicture, 
 
                 {/* Left Section: Post image and caption */}
                 <div className="w-1/2 flex flex-col overflow-y-auto">
+                    {
+                    post.image &&
                     <img src={post.image} alt="Post" className="object-cover h-full w-full p-3 rounded-lg" />
+                    }
                     <div className="px-4 py-3">
                         <div className="flex items-center gap-3 mb-2">
                             <FontAwesomeIcon
