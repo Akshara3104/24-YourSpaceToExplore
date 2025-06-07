@@ -232,7 +232,7 @@ export default function UserProfile() {
                                 </div>
                             }
 
-                            <div className="w-full text-center text-white bg-black/70 py-2">
+                            <div className={`w-full text-center text-white bg-black/70 p-4 line-clamp-${post.image ? '2' : '6'}`}>
                                 {post.caption}
                             </div>
                         </div>
