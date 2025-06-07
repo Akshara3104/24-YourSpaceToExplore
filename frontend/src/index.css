@@ -61,6 +61,22 @@
   scrollbar-width: none;     /* Firefox */
 }
 
+.clamp6 {
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.clamp2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+
+
 
 .react-select-container {
 background-color: #525252; /* Tailwind's bg-neutral-600 */

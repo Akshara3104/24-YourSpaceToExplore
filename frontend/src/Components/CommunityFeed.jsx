@@ -349,22 +349,24 @@ export default function CommunityFeed() {
                 <div className="my-6 grid grid-cols-3 gap-4">
                     {posts.map((post) => (
                         <div 
-                            key={post._id} 
-                            className="relative bg-gray-900 rounded-lg overflow-hidden shadow-md cursor-pointer"
-                            onClick={()=>setSelectedPost(post)}
+                            key={post._id}
+                            className="relative bg-gray-900 rounded-lg overflow-hidden shadow-md cursor-pointer transition hover:shadow-lg"
+                            onClick={() => setSelectedPost(post)}
                         >
-                            {
-                                post.image &&
+                            {post.image && (
                                 <div className="w-full aspect-square overflow-hidden">
-                                    <img 
-                                        src={post.image} 
-                                        alt="Post" 
-                                        className="w-full h-full object-cover"
-                                        />
+                                <img 
+                                    src={post.image} 
+                                    alt="Post image" 
+                                    className="w-full h-full object-cover"
+                                />
                                 </div>
-                            }
-
-                            <div className={`w-full text-center text-white bg-black/70 p-3 ${post.image ? 'line-clamp-2' : 'line-clamp-6'}`}>
+                            )}
+                            <div 
+                                className={`w-full text-white bg-black/70 p-3 text-center ${
+                                post.image ? 'line-clamp-2' : 'line-clamp-6'
+                                }`}
+                            >
                                 {post.caption}
                             </div>
                         </div>

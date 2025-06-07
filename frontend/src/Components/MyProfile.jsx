@@ -310,23 +310,26 @@ export default function MyProfile() {
                 <div className="my-6 grid grid-cols-3 gap-4">
                     {posts.map((post) => (
                         <div 
-                            key={post._id} 
-                            className="relative bg-gray-900 rounded-lg overflow-hidden shadow-md cursor-pointer"
-                            onClick={()=>setSelectedPost(post)}
+                        key={post._id}
+                            className="flex flex-col bg-gray-900 rounded-lg overflow-hidden shadow-md cursor-pointer transition hover:shadow-lg"
+                            onClick={() => setSelectedPost(post)}
                         >
-                            {
-                                post.image &&
+                        {/* Image */}
+                            {post.image && (
                                 <div className="w-full aspect-square overflow-hidden">
-                                    <img 
-                                        src={post.image} 
-                                        alt="Post" 
-                                        className="w-full h-full object-cover"
-                                        />
+                                <img 
+                                    src={post.image} 
+                                    alt="Post image" 
+                                    className="w-full h-full object-cover"
+                                />
                                 </div>
-                            }
+                            )}
 
+                            {/* Caption */}
                             <div 
-                            className={`w-full text-center text-white bg-black/70 p-3 ${post.image ? 'line-clamp-2' : 'line-clamp-6'}`}
+                                className={`text-white bg-black/70 p-3 text-center ${
+                                post.image ? 'clamp2' : 'clamp6 flex-1'
+                                }`}
                             >
                                 {post.caption}
                             </div>
