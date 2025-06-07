@@ -314,13 +314,16 @@ export default function MyProfile() {
                             className="relative bg-gray-900 rounded-lg overflow-hidden shadow-md cursor-pointer"
                             onClick={()=>setSelectedPost(post)}
                         >
-                            <div className="w-full aspect-square overflow-hidden">
-                                <img 
-                                    src={post.image} 
-                                    alt="Post" 
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
+                            {
+                                post.image &&
+                                <div className="w-full aspect-square overflow-hidden">
+                                    <img 
+                                        src={post.image} 
+                                        alt="Post" 
+                                        className="w-full h-full object-cover"
+                                        />
+                                </div>
+                            }
 
                             <div className="w-full text-center text-white bg-black/70 py-2">
                                 {post.caption}
