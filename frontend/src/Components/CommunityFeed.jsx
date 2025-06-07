@@ -364,7 +364,7 @@ export default function CommunityFeed() {
                                 </div>
                             }
 
-                            <div className={`w-full text-center text-white bg-black/70 p-4 line-clamp-${post.image ? '2' : '6'}`}>
+                            <div className={`w-full text-center text-white bg-black/70 p-3 ${post.image ? 'line-clamp-2' : 'line-clamp-6'}`}>
                                 {post.caption}
                             </div>
                         </div>
