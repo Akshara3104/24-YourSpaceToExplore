@@ -16,7 +16,7 @@ const port = 3001
 const {io, server, app} = require('./lib/socket.lib')
 
 const allowedOrigins = [
-  "https://nquery-one.vercel.app",
+  "https://24-your-space-to-explore.vercel.app",
   "http://localhost:3000" 
 ];
 
