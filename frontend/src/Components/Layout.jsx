@@ -1,7 +1,5 @@
-import axios from 'axios'
-import React from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
-import { House, MessageCircle, Tag, Users, Search, LogOut, Bell } from 'lucide-react'
+import { House, MessageCircle, Tag, Users, Search, Bell } from 'lucide-react'
 import NotLoggedIn from './NotLoggedIn'
 import { ToastContainer } from 'react-toastify'
 

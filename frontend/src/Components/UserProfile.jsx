@@ -1,9 +1,9 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Loader from './Loader'; // Assuming this is your loading spinner component
+import Loader from './Loader';
 import PostModal from './PostModal';
-import { MessageSquare, UserPlus, UserMinus, Loader2, MapPin, Globe } from 'lucide-react'; // Added icons for location, website, etc.
+import { MessageSquare, UserPlus, UserMinus, Loader2 } from 'lucide-react'; 
 import { ToastContainer, toast, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -23,14 +23,14 @@ export default function UserProfile() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const userId = localStorage.getItem('userId'); // Current logged-in user's ID
-    const profilePicture = localStorage.getItem('profilePicture'); // Current logged-in user's profile picture
-    const name = localStorage.getItem('name'); // Current logged-in user's name
+    const userId = localStorage.getItem('userId'); 
+    const profilePicture = localStorage.getItem('profilePicture'); 
+    const name = localStorage.getItem('name'); 
 
-    const [user, setUser] = React.useState(null); // The target user's profile data
-    const [posts, setPosts] = React.useState([]); // The target user's posts
-    const [isFollowing, setIsFollowing] = React.useState(false); // If current user follows target user
-    const [isProcessingFollow, setIsProcessingFollow] = React.useState(false); // For follow button state
+    const [user, setUser] = React.useState(null); 
+    const [posts, setPosts] = React.useState([]); 
+    const [isFollowing, setIsFollowing] = React.useState(false); 
+    const [isProcessingFollow, setIsProcessingFollow] = React.useState(false); 
 
     const [showConnectionModal, setShowConnectionModal] = React.useState(false);
     const [modalTitle, setModalTitle] = React.useState("");
@@ -38,10 +38,8 @@ export default function UserProfile() {
 
     const [selectedPost, setSelectedPost] = React.useState(null);
 
-    // Ensure targetId is correctly retrieved from location.state
-    const { targetId } = location.state || {}; // Add || {} to prevent errors if state is null/undefined
+    const { targetId } = location.state || {}; 
 
-    // Redirect if trying to view self on user profile page
     React.useEffect(() => {
         if (targetId === userId) {
             navigate('/24/my-profile');
@@ -51,11 +49,9 @@ export default function UserProfile() {
     const fetchProfile = async () => {
         if (!targetId) {
             console.error("No targetId provided in location state.");
-            // Handle error or redirect as appropriate
             return;
         }
         try {
-            // Updated backend endpoint to pass userId for isFollowing status
             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/user/getUserProfile`, { userId: userId, targetId });
             setUser(res.data.userProfile);
             setPosts(res.data.userProfile.posts);
@@ -63,25 +59,24 @@ export default function UserProfile() {
         } catch (error) {
             console.error("Error fetching profile:", error);
             toast.error("Failed to load profile. Please try again.", toastSettings);
-            setUser(null); // Clear user data on error
+            setUser(null); 
         }
     };
 
     const handleShowConnections = async (type) => {
-        if (!userId) { // Ensure logged in to view connections
+        if (!userId) { 
             toast.info("Please log in to view connections.", toastSettings);
             return;
         }
         try {
             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/user/getConnections`, {
-                targetId, // Fetch connections for the TARGET user
+                targetId, 
                 type,
             });
             setModalUsers(res.data.users);
             setModalTitle(type);
             setShowConnectionModal(true);
         } catch (err) {
-            console.error("Error fetching connections", err);
             toast.error(`Failed to load ${type}.`, toastSettings);
         }
     };
@@ -91,17 +86,15 @@ export default function UserProfile() {
             toast.error("You must be logged in to follow users.", toastSettings);
             return;
         }
-        if (isProcessingFollow) return; // Prevent double clicks
+        if (isProcessingFollow) return; 
 
         setIsProcessingFollow(true);
         try {
-            // Your backend toggleFollow endpoint is good, ensure it returns updated isFollowing status
             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/user/toggleFollow`, { userId, targetId, isFollowing });
-            setIsFollowing(res.data.isFollowing); // Update state based on backend response
+            setIsFollowing(res.data.isFollowing);
             toast.success(res.data.message || (isFollowing ? "Unfollowed!" : "Followed!"), toastSettings);
-            fetchProfile(); // Re-fetch profile to update follower/following counts
+            fetchProfile(); 
         } catch (error) {
-            console.error("Error performing follow action:", error);
             toast.error("Could not complete action. Please try again.", toastSettings);
         } finally {
             setIsProcessingFollow(false);
@@ -110,9 +103,8 @@ export default function UserProfile() {
 
     React.useEffect(() => {
         fetchProfile();
-    }, [targetId, isFollowing]); // Added isFollowing to dependency array to re-fetch counts after follow/unfollow
+    }, [targetId, isFollowing]); 
 
-    // ConnectionModal remains exactly as you provided
     const ConnectionModal = () => {
         return (
             <div className="fixed inset-0 w-full bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -145,7 +137,7 @@ export default function UserProfile() {
                                     }}
                                 >
                                     <img src={item.profilePicture || '/images/DefaultProfile.jpeg'} alt="Profile" className="w-10 h-10 rounded-full object-cover" />
-                                    <span className="text-white font-medium">{item.name || item.communityName}</span> {/* Added communityName for communities */}
+                                    <span className="text-white font-medium">{item.name || item.communityName}</span> 
                                 </li>
                             ))}
                         </ul>
@@ -155,11 +147,10 @@ export default function UserProfile() {
         );
     };
 
-    // Show Loader while fetching profile data
     if (!user) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-zinc-900 text-white">
-                <Loader /> {/* Your Loader component */}
+                <Loader />
             </div>
         );
     }
@@ -333,10 +324,10 @@ export default function UserProfile() {
                 post={selectedPost}
                 isOpen={!!selectedPost}
                 onClose={() => setSelectedPost(null)}
-                user={user} // The target user's details for displaying post owner info
-                userId={userId} // Current logged-in user's ID for interaction within the modal
-                name={name} // Current logged-in user's name
-                profilePicture={profilePicture} // Current logged-in user's profile picture
+                user={user} 
+                userId={userId} 
+                name={name} 
+                profilePicture={profilePicture}
                 type='user'
             />
 

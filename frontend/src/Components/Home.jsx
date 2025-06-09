@@ -12,9 +12,9 @@ export default function LandingPage() {
     }
 
     return (
-        <div className="section text-white bg-gradient-to-br from-zinc-950 to-zinc-800 min-h-screen overflow-y-auto ">
+        <div className="section text-white bg-gradient-to-br from-zinc-950 to-zinc-800 min-h-screen overflow-y-auto">
             {/* Hero Section */}
-            <section id="hero" className="relative flex items-center justify-center h-[70vh] md:h-[80vh] px-6 py-20 bg-cover bg-center text-center overflow-hidden section"
+            <section id="hero" className="relative section flex items-center justify-center h-[70vh] md:h-[80vh] px-6 py-20 bg-cover bg-center text-center overflow-hidden section"
                 style={{ backgroundImage: "url('/images/Hero3.jpg')" }} // Placeholder background image
             >
                 <div className="absolute inset-0 bg-black opacity-70"></div> {/* Overlay for readability */}
@@ -156,14 +156,14 @@ export default function LandingPage() {
             <footer className="bg-zinc-900 text-gray-400 py-12 px-6 shadow-inner">
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:justify-between gap-10 text-center md:text-left">
                     {/* Left Column: Logo and Tagline - Kept as is */}
-                    <div className="flex flex-col items-center md:w-1/3">
+                    <div className="flex flex-col items-center justify-end md:w-1/3">
                         <img
                             src='/images/Logo1.png'
                             alt='App Logo'
                             className='w-20 mb-4'
                         />
-                        <p className="text-gray-400 mb-4 text-md leading-relaxed">Connecting the world, one genuine interaction at a time.</p>
-                        <p className="text-gray-500 text-sm mt-auto">&copy; {new Date().getFullYear()} **24**. All rights reserved.</p>
+                        <p className="text-gray-400 text-md mb-3 leading-relaxed">Your Space To Explore</p>
+                        <p className="text-gray-500 text-sm">&copy; {new Date().getFullYear()} 24. All rights reserved.</p>
                     </div>
 
                     <div className="flex flex-col items-center md:items-start md:w-1/3">

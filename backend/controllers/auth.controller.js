@@ -25,7 +25,6 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body.data;
-        console.log(email, password)
         const findUser = await UserModel.findOne({ email });
 
         if (!findUser) {

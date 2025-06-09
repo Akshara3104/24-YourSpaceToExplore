@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loader from './Loader'; 
-import { Plus, Pencil, MessageSquare, Users, Globe } from 'lucide-react'; 
+import { Plus, Pencil, MessageSquare, Users, Loader2 } from 'lucide-react'; 
 import { ToastContainer, toast, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PhotoUploadLoader from './PhotoUploadLoader';
@@ -44,7 +44,6 @@ export default function CommunityFeed() {
 
     const getCommunity = async () => {
         if (!communityId) {
-            console.error("No communityId provided in location state.");
             return;
         }
         try {
@@ -53,7 +52,6 @@ export default function CommunityFeed() {
             setCommunity(res.data.community);
             setJoined(res.data.isJoined);
         } catch (error) {
-            console.error("Error fetching community details:", error);
             toast.error("Failed to load community. Please try again.", toastSettings);
             setCommunity(null); 
         }
@@ -77,7 +75,6 @@ export default function CommunityFeed() {
                 toast.error(res.data.message || "Failed to toggle join status.", toastSettings);
             }
         } catch (error) {
-            console.error("Error toggling join status:", error);
             toast.error("Could not complete action. Please try again.", toastSettings);
         } finally {
             setIsProcessingJoin(false);
@@ -94,7 +91,6 @@ export default function CommunityFeed() {
                 setMembers(res.data.members);
                 setCreatedBy(res.data.createdBy);
             } catch (error) {
-                console.error("Error fetching members:", error);
                 toast.error("Failed to load members.", toastSettings);
             }
         };
@@ -125,7 +121,7 @@ export default function CommunityFeed() {
                                 }
                             }}
                         >
-                            <img src={createdBy.profilePicture || '/images/Defaultprofile.jpeg'} alt="Profile" className="w-10 h-10 rounded-full object-cover" />
+                            <img src={createdBy.profilePicture || '/images/Defaultprofile.jpg'} alt="Profile" className="w-10 h-10 rounded-full object-cover" />
                             <span className="text-white font-medium">{createdBy.name}</span>
                             <span className='ms-auto bg-gradient-to-r from-orange-500 to-red-500 rounded-full py-1 px-2 text-xs font-semibold'>admin</span>
                         </div>
@@ -169,12 +165,8 @@ export default function CommunityFeed() {
 
         const createNewPost = async () => {
             try {
-                if (newPost.image === '') {
-                    toast('Please select an image for your post.', localToastSettings);
-                    return;
-                }
-                if (newPost.caption.trim() === '') {
-                    toast('Please add a caption for your post.', localToastSettings);
+                if (newPost.image === '' && newPost.caption.trim() === '') {
+                    toast('Please select image or write caption.', localToastSettings);
                     return;
                 }
                 
@@ -184,7 +176,6 @@ export default function CommunityFeed() {
                 getCommunity(); 
                 setNewPost({ image: '', caption: '' }); 
             } catch (error) {
-                console.error("Error creating post:", error);
                 toast.error('Failed to create post. Please try again.', toastSettings);
             }
         };
@@ -211,12 +202,11 @@ export default function CommunityFeed() {
                     toast.success("Image uploaded!", localToastSettings);
                 } else {
                     toast.error("Image upload failed.", localToastSettings);
-                    setPhotoUploaded(true); // Reset state even on failure
+                    setPhotoUploaded(true); 
                 }
             } catch (error) {
-                console.error("Error uploading image to Cloudinary:", error);
                 toast.error("Image upload failed. Please try again.", localToastSettings);
-                setPhotoUploaded(true); // Reset state on error
+                setPhotoUploaded(true); 
             }
         };
 
@@ -275,7 +265,7 @@ export default function CommunityFeed() {
                             <button
                                 type="submit"
                                 onClick={createNewPost}
-                                disabled={!photoUploaded || newPost.caption.trim() === ''} // Disable if photo not uploaded or caption is empty
+                                disabled={(newPost.image.trim() === '' && newPost.caption.trim() === '') || !photoUploaded } 
                                 className="flex-1 px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-indigo-700 text-white font-semibold shadow-lg hover:from-purple-700 hover:to-indigo-800 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Post
@@ -358,7 +348,7 @@ export default function CommunityFeed() {
                             >
                                 {isProcessingJoin ? (
                                     <>
-                                        <Loader className="animate-spin" size={20} /> {joined ? 'Leaving...' : 'Joining...'}
+                                        <Loader2 className="animate-spin text-purple-500" size={20} /> {joined ? 'Leaving...' : 'Joining...'}
                                     </>
                                 ) : joined ? (
                                     <>
@@ -462,13 +452,9 @@ export default function CommunityFeed() {
                                     </div>
                                 )}
                                 <div className="p-4 flex-grow">
-                                    <p className={`text-gray-200 ${post.image ? 'line-clamp-3' : 'line-clamp-6'} text-base leading-relaxed`}>
+                                    <p className={`text-gray-200 ${post.image ? 'line-clamp-3': 'line-clamp-6'} text-base leading-relaxed`}>
                                         {post.caption || (post.image ? 'Image post' : 'No caption')}
                                     </p>
-                                </div>
-                                <div className="p-4 border-t border-zinc-700 text-gray-400 text-sm flex justify-between items-center">
-                                    <span>{post.likes || 0} Likes</span>
-                                    <span>{post.comments || 0} Comments</span>
                                 </div>
                             </div>
                         ))}
@@ -504,6 +490,7 @@ export default function CommunityFeed() {
                 name={name} 
                 profilePicture={profilePicture} 
                 type='community'
+                admin={community.createdBy}
             />
             <ToastContainer />
         </div>

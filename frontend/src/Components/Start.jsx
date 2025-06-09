@@ -1,4 +1,3 @@
-import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
@@ -8,7 +7,7 @@ export default function Start() {
 
     return (
         <div className='p-4 h-screen bg-black'>
-        <div className='h-full bg-neutral-800 rounded d-flex flex-col justify-center items-center gap-3'>
+        <div className='h-full bg-neutral-950 rounded d-flex flex-col justify-center items-center gap-3'>
             <img
                 className='w-40 shadowLog'
                 src='/images/Logo3.png' 

@@ -17,7 +17,7 @@ function ChatComponent() {
     const [text, setText] = useState("");
     const [messages, setMessages] = useState([]);
 
-    const messagesEndRef = useRef(null); // Ref for auto-scrolling
+    const messagesEndRef = useRef(null); 
 
     const navigate = useNavigate()
 
@@ -48,7 +48,6 @@ function ChatComponent() {
             year: "numeric",
             });
 
-            console.log(prev)
 
             return {
             ...prev,
@@ -64,7 +63,6 @@ function ChatComponent() {
 
         socket.on("receiveMessage", (message) => {
         if (message.senderId === targetId || message.targetId === targetId) {
-            // setMessages((prev) => [...prev, message]); 
             setMessages((prev) => {
                 const dateKey = new Date(message.createdAt).toLocaleDateString("en-GB", {
                 day: "2-digit",
@@ -72,7 +70,6 @@ function ChatComponent() {
                 year: "numeric",
                 });
 
-                console.log(prev)
 
             return {
                 ...prev,
@@ -80,7 +77,7 @@ function ChatComponent() {
             };
         });
         } else {
-            // Handle unseen messages (like notifications)
+            
         }
         });
 

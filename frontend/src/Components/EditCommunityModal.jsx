@@ -163,7 +163,7 @@ const EditCommunityModal = ({ title, image, description, tags, setShowEditProfil
                     styles={{
                         control: (provided) => ({
                         ...provided,
-                        backgroundColor: '#525252', // Tailwind's bg-neutral-600
+                        backgroundColor: '#525252', 
                         borderColor: '#404040',
                         color: 'white'
                         }),

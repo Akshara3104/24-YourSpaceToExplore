@@ -93,7 +93,6 @@ exports.editProfile = async(req, res)=>{
         const { communityId, newData } = req.body
 
         const community = await CommunityModel.findById(communityId)
-        console.log(community, newData)
 
         community.title = newData.title
         community.image = newData.image
@@ -266,7 +265,6 @@ io.on("connection", (socket) => {
         const msg = new CommunityMessagesModel({ communityId, senderId, text, image });
         await msg.save();
         const photoName = await UserModel.find({_id: senderId._id}).select('profilePicture name')
-        console.log(photoName)
         io.to(communityId).emit("receiveCommunityMessage", {...msg._doc, tempId, photoName});
     }); 
 

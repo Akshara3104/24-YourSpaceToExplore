@@ -17,7 +17,6 @@ export default function ExploreAccounts() {
             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/user/fetchByTags`, { tag })
             setUsers(res.data.users)
             setCommunities(res.data.communities)
-            console.log(res.data)
         } catch (error) {
             console.log('Error occured')
         }

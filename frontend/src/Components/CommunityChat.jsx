@@ -26,7 +26,6 @@ export default function CommunityChat() {
         try {
             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/community/getMessages`, {communityId})
             setMessages(res.data.messages)
-            console.log(res.data.messages)
 
         } catch (error) {
             console.log(error.message)
@@ -50,9 +49,6 @@ export default function CommunityChat() {
             communityId,
             image: ''
         }
-
-        console.log('sent', message)
-
         socket.emit("sendCommunityMessage", message);
         setMessages((prev) => [...prev, message]); // Optimistic UI update
         setText("");
@@ -80,13 +76,12 @@ export default function CommunityChat() {
         socket.off("receiveCommunityMessage").on("receiveCommunityMessage", handleMessage);
     
         return () => {
-            socket.emit("leaveCommunity", communityId); // Leave the community on unmount
-            socket.off("receiveCommunityMessage", handleMessage); // Cleanup event listener
+            socket.emit("leaveCommunity", communityId); 
+            socket.off("receiveCommunityMessage", handleMessage); 
         };
     }, [communityId]);
     
     React.useEffect(()=>{
-        // console.log(messages)
         messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
     }, [messages])
     

@@ -16,7 +16,6 @@ export default function Notifications() {
             setOpened(res.data.opened)
             setNotOpened(res.data.notOpened) 
         } catch (error) {
-            console.log(error.message)
             return null
         }
     }
@@ -25,7 +24,6 @@ export default function Notifications() {
         try {
             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/user/makeAllRead`, { userId })
         } catch (error) {
-            console.log(error.message)
             return null
         }
     }

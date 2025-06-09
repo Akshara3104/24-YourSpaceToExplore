@@ -50,7 +50,6 @@ export default function MyProfile() {
             setPosts(res.data.userProfile.posts);
             setError(null); 
         } catch (error) {
-            console.error("Error fetching profile:", error);
             setError("Failed to load profile. Please try again.");
             setUser(null); 
             setPosts([]); 
@@ -69,7 +68,6 @@ export default function MyProfile() {
             setModalTitle(type);
             setShowConnectionModal(true);
         } catch (err) {
-            console.error("Error fetching connections", err);
             toast.error(`Failed to load ${type}.`, toastSettings);
         }
     };
@@ -130,8 +128,8 @@ export default function MyProfile() {
             image: null,
             caption: ''
         });
-        const [photoUploaded, setPhotoUploaded] = useState(true); // True initially, becomes false during upload
-        const [isSubmitting, setIsSubmitting] = useState(false); // To prevent double submissions
+        const [photoUploaded, setPhotoUploaded] = useState(true);
+        const [isSubmitting, setIsSubmitting] = useState(false); 
 
         const createNewPost = async () => {
             if (isSubmitting) return;
@@ -146,12 +144,9 @@ export default function MyProfile() {
                 toast.success('Post created successfully! Refreshing page...', toastSettings);
                 setTimeout(() => {
                     setShowNewPost(false);
-                    // A better way would be to update the state directly after successful post,
-                    // but for simplicity and consistency with your original code, a full reload:
                     window.location.reload();
                 }, 1500);
             } catch (error) {
-                console.error("Error creating post:", error);
                 toast.error('Failed to create post. Please try again.', toastSettings);
             } finally {
                 setIsSubmitting(false);
@@ -162,11 +157,11 @@ export default function MyProfile() {
             const file = event.target.files[0];
             if (!file) return;
 
-            setPhotoUploaded(false); // Start photo upload loader
+            setPhotoUploaded(false); 
 
             const data = new FormData();
             data.append('file', file);
-            data.append('upload_preset', 'nquery'); // Ensure this matches your Cloudinary preset
+            data.append('upload_preset', 'nquery'); 
             data.append('cloud_name', process.env.REACT_APP_CLOUD_NAME);
 
             try {
@@ -180,11 +175,10 @@ export default function MyProfile() {
                 }));
                 toast.success("Photo uploaded!", { ...toastSettings, autoClose: 1000 });
             } catch (error) {
-                console.error("Error uploading photo to Cloudinary:", error);
                 toast.error("Photo upload failed.", toastSettings);
-                setNewPost(prev => ({ ...prev, image: null })); // Clear image on error
+                setNewPost(prev => ({ ...prev, image: null }));
             } finally {
-                setPhotoUploaded(true); // Hide loader regardless of success/failure
+                setPhotoUploaded(true); 
             }
         };
 
@@ -329,7 +323,7 @@ export default function MyProfile() {
                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 to-transparent"></div> {/* Gradient overlay */}
                 <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 sm:left-8 sm:transform-none">
                     <img
-                        src={user.profilePicture || '/images/DefaultProfile.jpeg'}
+                        src={user.profilePicture || '/images/DefaultProfile.jpg'}
                         alt="Profile"
                         className="w-36 h-36 sm:w-48 sm:h-48 rounded-full object-cover border-4 border-purple-600 shadow-2xl transition-transform duration-300 hover:scale-105"
                     />
@@ -490,7 +484,6 @@ export default function MyProfile() {
                     careerInterests={user.careerInterests}
                     setShowEditProfile={setShowEditProfile}
                     userId={userId}
-                    // Pass update function if you want to refresh the profile without full reload
                     onProfileUpdated={fetchProfile}
                 />
             )}
@@ -499,11 +492,11 @@ export default function MyProfile() {
                 post={selectedPost}
                 isOpen={!!selectedPost}
                 onClose={() => setSelectedPost(null)}
-                user={user} // Pass the full user object if PostModal needs it
+                user={user}
                 userId={userId}
-                name={name} // Use stored name and profile picture from local storage
+                name={name} 
                 profilePicture={profilePicture}
-                type='user' // Indicate it's a user post for modal logic
+                type='user'
             />
 
             <ToastContainer />

@@ -20,7 +20,6 @@ exports.follow = async (req, res)=>{
         return res.status(200).send({success: true, message: 'Following'})
 
     }catch(error){
-        console.log(error.message)
         return res.status(400).send({success: false, message: 'Error occured' })
     }
 }
@@ -67,7 +66,7 @@ exports.getMyProfile = async (req, res) => {
                     pipeline: [
                         { $match: { $expr: { $eq: ["$userId", "$$userId"] } } },
                         { $sort: { createdAt: -1 } },
-                        { $project: { _id: 1, image: 1, caption: 1, createdAt: 1 } }
+                        { $project: { _id: 1, image: 1, caption: 1, createdAt: 1, userId: 1 } }
                     ],
                     as: "posts"
                 }
@@ -81,7 +80,7 @@ exports.getMyProfile = async (req, res) => {
                     followerCount: 1,
                     followingCount: 1,
                     communitiesCount: 1,
-                    posts: { _id: 1, image: 1, caption: 1, createdAt: 1 }
+                    posts: { _id: 1, image: 1, caption: 1, createdAt: 1, userId: 1 }
                 }
             }
         ]);

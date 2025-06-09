@@ -84,7 +84,6 @@ export default function Communities() {
     
             const file = event.target.files[0]
             if(!file) return 
-            console.log(file)
     
             const data = new FormData()
     

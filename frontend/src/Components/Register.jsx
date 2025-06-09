@@ -1,147 +1,136 @@
-import React from 'react'
-import RegisterPhoto from '../Assests/RegisterPhoto.jpg'
-import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
-import { toast } from 'react-toastify'
-import toastSettings from './toastSettings'
+import React from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import toastSettings from './toastSettings';
 
 export default function Register() {
-
     const [data, setData] = React.useState({
         name: '',
         email: '',
         password: ''
-    })
+    });
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
-    const handleSubmit = async (e)=>{
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setData(prev => {
+            return { ...prev, [name]: value };
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
-            e.preventDefault()
-            if(data.email===''){
-                alert('Please enter your email')
-                return
-            }
-            if(data.name===''){
-                alert('Please enter your name')
-                return
-            }
-            if(data.password===''){
-                alert('Please enter your password')
-                return
-            }
+            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/auth/register`, data);
 
-            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/auth/register`, data)
-
-            if(!res.data.success)   alert(res.data.message)
-                
-            if(res.data.success){
-                toast('Sign Up successful', toastSettings)
-                setTimeout(()=>{
-                    navigate('/login')
-                }, 1000)
+            if (res.data.success) {
+                toast.success('Sign Up successful! Redirecting to login...', toastSettings);
+                setTimeout(() => {
+                    navigate('/login');
+                }, 1500);
+            } else {
+                toast.error(res.data.message || 'Registration failed. Please try again.', toastSettings);
             }
         } catch (error) {
-            console.log(error)
+            toast.error('An error occurred during registration. Please try again.', toastSettings);
+        } finally {
+            setData({
+                name: '',
+                email: '',
+                password: ''
+            });
         }
-        setData({
-            name: '',
-            email: '',
-            password: ''
-        })
-    }
-
-    const handleChange = (e)=>{
-        const {name, value} = e.target
-        setData(prev=>{
-            return {...prev, [name]: value}
-        })
-    }
-
+    };
 
     return (
+        <div className="min-h-screen bg-zinc-950 text-white font-['Inter'] flex items-center justify-center p-4 sm:p-6">
+            <div className="w-full max-w-5xl rounded-2xl flex flex-col md:flex-row-reverse overflow-hidden">
 
-    <div className="min-h-screen bg-neutral-900 text-white">
-        <div className="mx-auto max-w-8xl min-h-screen flex flex-col">
-
-            <main className="flex-grow flex items-center justify-center px-6 py-12">
-                <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-16">
-
-                    <div className="flex flex-col justify-center">
-                        <h1 className="text-4xl font-bold text-white mb-6">Create Your Account</h1>
-
-                        <form className="space-y-4" onSubmit={handleSubmit}>
-                            <div>
-                                <label className="block mb-1 text-sm text-gray-300">Email</label>
-                                <input 
-                                    type="email" 
-                                    name="email"
-                                    placeholder="Enter your email"
-                                    className="w-full px-4 py-2 rounded-md bg-neutral-800 text-white placeholder-gray-400 border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                    value={data.email}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block mb-1 text-sm text-gray-300">Full Name</label>
-                                <input 
-                                    type="text" 
-                                    name="name"
-                                    placeholder="Enter your name"
-                                    className="w-full px-4 py-2 rounded-md bg-neutral-800 text-white placeholder-gray-400 border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                    value={data.name}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-
-                            <div className='mb-3'>
-                                <label className="block mb-1 text-sm text-gray-300">Password</label>
-                                <input 
-                                    type="password" 
-                                    name="password"
-                                    placeholder="Enter a secure password"
-                                    className="w-full px-4 py-2 rounded-md bg-neutral-800 text-white placeholder-gray-400 border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                    value={data.password}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-
-                            <button 
-                                type="submit"
-                                className="w-full bg-gradient-to-r from-orange-500 to-red-500 py-2 rounded-md text-white hover:opacity-90 transition"
-                            >
-                                Sign Up
-                            </button>
-
-                            <div className="relative my-6">
-                                <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-neutral-700"></div>
-                                </div>
-                                <div className="relative flex justify-center text-sm">
-                                    <span className="px-4 bg-neutral-900 text-gray-400">OR</span>
-                                </div>
-                            </div>
-                        </form>
-
-                        <div className="mt-4 text-center text-sm">
-                            <p className="text-gray-400">
-                                Already have an account?{" "}
-                                <span 
-                                    onClick={() => navigate("/login")} 
-                                    className="text-orange-400 hover:underline cursor-pointer"
-                                >
-                                    Sign in
-                                </span>
-                            </p>
+                {/* Right Section: Branding Image & Text (on left for register) */}
+                <div className="relative w-full md:w-1/2 hidden md:flex items-center justify-center p-4 rounded-l-2xl">
+                    <div className="flex flex-col items-center text-center">
+                        <img
+                            className='w-48 lg:w-50 drop-shadow-lg animate-float'
+                            src='/images/Logo3.png'
+                            alt='App Logo'
+                        />
+                        <div className='mt-6 text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-orange-400 via-pink-500 to-red-600 bg-clip-text text-transparent leading-tight'>
+                            Your Space To Explore
                         </div>
                     </div>
                 </div>
-            </main>
+
+                {/* Left Section: Form */}
+                <main className="w-full md:w-1/2 p-8 sm:p-12 flex flex-col justify-center">
+                    <h1 className="text-4xl font-extrabold text-white mb-6 text-center md:text-left">Create Your Account</h1>
+
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="Enter your email"
+                                className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-white placeholder-gray-400 border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-purple-600 transition duration-200"
+                                onChange={handleChange}
+                                value={data.email}
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                placeholder="Enter your full name"
+                                className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-white placeholder-gray-400 border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-purple-600 transition duration-200"
+                                onChange={handleChange}
+                                value={data.name}
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Enter a secure password"
+                                className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-white placeholder-gray-400 border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-purple-600 transition duration-200"
+                                onChange={handleChange}
+                                value={data.password}
+                                required
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="w-full bg-gradient-to-r from-orange-500 to-red-600 py-3 rounded-lg text-white font-semibold text-lg shadow-md hover:from-orange-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75"
+                        >
+                            Sign Up
+                        </button>
+                    </form>
+
+                    <div className="mt-4 text-center text-sm">
+                        <p className="text-gray-400">
+                            Already have an account?{" "}
+                            <span
+                                onClick={() => navigate("/login")}
+                                className="text-purple-400 hover:underline cursor-pointer font-medium"
+                            >
+                                Sign in
+                            </span>
+                        </p>
+                    </div>
+                </main>
+            </div>
+            <ToastContainer /> 
         </div>
-    </div>
-  )
+    );
 }
