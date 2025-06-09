@@ -51,7 +51,7 @@ export default function SearchComponent() {
                         className="flex items-start gap-4 p-4 bg-neutral-800 hover:bg-gradient-to-r from-orange-500 to-red-500 rounded-xl shadow-md cursor-pointer transition my-2 hover:scale-105"
                         onClick={() => {
                             if(userId!==user._id){
-                            navigate(`/nquery/${user.name}/profile`, {
+                            navigate(`/24/${user.name}/profile`, {
                             state: { targetId: user._id }
                         })}}}
                     >
@@ -81,7 +81,7 @@ export default function SearchComponent() {
                     <div
                         key={index}
                         className="flex items-start gap-4 p-4 bg-neutral-800 hover:bg-gradient-to-r from-orange-500 to-red-500 rounded-xl shadow-md cursor-pointer transition my-2 hover:scale-105"
-                        onClick={() => navigate(`/nquery/community/${community._id}`, {
+                        onClick={() => navigate(`/24/community/${community._id}`, {
                         state: { communityId: community._id }
                         })}
                     >

@@ -96,7 +96,7 @@ function ChatComponent() {
             {/* Header */}
             <div 
                 className="shadow p-4 flex justify-between items-center cursor-pointer mb-3 section" 
-                onClick={()=>navigate(`/nquery/${targetName}/profile`, {state: {targetId}})}
+                onClick={()=>navigate(`/24/${targetName}/profile`, {state: {targetId}})}
             >
                 <div className="flex items-center space-x-3">
                     <img

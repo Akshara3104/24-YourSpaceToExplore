@@ -34,35 +34,42 @@ export default function Layout() {
 
     return (
     <div className='vh-100 bg-black d-flex'>
-        <div className='w-20 m-3 d-flex flex-column justify-center section border-radius py-3'>
+        <div className='w-20 m-3 d-flex flex-column justify-between section border-radius py-3'>
         <div className='m-2 mx-auto d-flex flex-column gap-3 items-center'>
-            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/nquery')}>
+            <div className='w-fit rounded cursor-pointer' onClick={()=>navigate('/24')}>
+                <img 
+                    className='px-3'
+                    src='/images/Logo3.png'
+                />
+            </div>
+        </div>
+        <div className='m-2 mx-auto d-flex flex-column gap-3 items-center'>
+            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/24')}>
                 <House />
             </div>
-            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/nquery/messages')}>
+            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/24/messages')}>
                 <MessageCircle />
             </div>
-            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/nquery/communities')}>
+            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/24/communities')}>
                 <Users />
             </div>
-            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/nquery/search')}>
+            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/24/search')}>
                 <Search />
             </div>
-            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/nquery/explore')}>
+            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/24/explore')}>
                 <Tag />
             </div>
-            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/nquery/notifications')}>
+            <div className='w-fit p-2 rounded cursor-pointer hover:bg-gradient-to-r from-orange-400 to-red-500 hover:scale-110 transition' onClick={()=>navigate('/24/notifications')}>
                 <Bell />
             </div>
-            <div className='w-fit p-2 cursor-pointer rounded hover:bg-neutral-600' onClick={()=>logout()}>
-                <LogOut />
-            </div>
+        </div>
+        <div className='m-2 mx-auto d-flex flex-column gap-3 items-center'>
             <img  
                 src={profilePicture || '/images/DefaultProfile.jpg'} 
                 alt='No photo' 
                 className='w-12 h-12 rounded-full cursor-pointer mb-2'
                 spellCheck={false}
-                onClick={()=>navigate('/nquery/me/profile')}
+                onClick={()=>navigate('/24/me/profile')}
             />
         </div>
         </div>

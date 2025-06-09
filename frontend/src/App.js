@@ -36,21 +36,21 @@ function App() {
         <Route path="/" element={ <Start /> } />
         <Route path="/login" element={ <Login /> } />
         <Route path="/register" element={ <Register /> } />
-        <Route path="/nquery" element={ <Layout /> }>
-          <Route path="/nquery" element={ <Home /> } />
-          <Route path="/nquery/search" element={ <SearchComponent /> } />
-          <Route path="/nquery/explore" element={ <ExploreTags /> } />
-          <Route path="/nquery/tag/:tag" element={ <ExploreAccounts /> } />
-          <Route path="/nquery/notifications" element={ <Notifications /> } />
-          <Route path="/nquery/messages" element={ <MessageHome /> } >
-            <Route path="/nquery/messages/:targetId" element={ <ChatComponent /> } />
+        <Route path="/24" element={ <Layout /> }>
+          <Route path="/24" element={ <Home /> } />
+          <Route path="/24/search" element={ <SearchComponent /> } />
+          <Route path="/24/explore" element={ <ExploreTags /> } />
+          <Route path="/24/tag/:tag" element={ <ExploreAccounts /> } />
+          <Route path="/24/notifications" element={ <Notifications /> } />
+          <Route path="/24/messages" element={ <MessageHome /> } >
+            <Route path="/24/messages/:targetId" element={ <ChatComponent /> } />
           </Route>
-          <Route path="/nquery/communities" element={ <Communities /> } >
-            <Route path="/nquery/communities/:id/chat" element={ <CommunityChat /> } />
+          <Route path="/24/communities" element={ <Communities /> } >
+            <Route path="/24/communities/:id/chat" element={ <CommunityChat /> } />
           </Route>
-          <Route path="/nquery/community/:id" element={ <CommunityFeed /> } />
-          <Route path="/nquery/me/profile" element={ <MyProfile /> } />
-          <Route path="/nquery/:name/profile" element={<UserProfile />} /> 
+          <Route path="/24/community/:id" element={ <CommunityFeed /> } />
+          <Route path="/24/me/profile" element={ <MyProfile /> } />
+          <Route path="/24/:name/profile" element={<UserProfile />} /> 
         </Route>
       </Routes>
     </BrowserRouter>

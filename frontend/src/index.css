@@ -61,19 +61,54 @@
   scrollbar-width: none;     /* Firefox */
 }
 
-.clamp6 {
-  display: -webkit-box;
-  -webkit-line-clamp: 6;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.clamp2, .clamp6, .clamp3{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+} 
+
+.clamp6 {     
+  -webkit-line-clamp: 10;   
+  line-height: 2.2; 
+}
+
+
+.clamp3 {
+    -webkit-line-clamp: 3;
 }
 
 .clamp2 {
-    display: -webkit-box;
     -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
 }
+
+.shadowLogo {
+    filter: drop-shadow(3px 3px 6px rgba(255, 69, 0, 0.6));
+
+
+}
+
+.container {
+  position: relative;
+  display: inline-block;
+}
+
+.logo {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+.gradient-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(45deg, #ff0000, #ffa500); /* red to orange */
+  mix-blend-mode: multiply;
+  pointer-events: none; /* so clicks pass through */
+  z-index: 2;
+}
+
+
 
 
 

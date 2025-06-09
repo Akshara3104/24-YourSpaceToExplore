@@ -95,7 +95,7 @@ export default function CommunityChat() {
     <div className="flex-1 flex flex-col h-full ms-3">
         {/* Header */}
         <div className="shadow p-4 flex justify-between items-center commTitle section mb-3 cursor-pointer">
-            <div className="flex items-center space-x-3" onClick={()=>navigate(`/nquery/community/${communityId}`, {state:{communityId: communityId}})}>
+            <div className="flex items-center space-x-3" onClick={()=>navigate(`/24/community/${communityId}`, {state:{communityId: communityId}})}>
                 <img
                     src={communityImage}
                     alt="Profile"

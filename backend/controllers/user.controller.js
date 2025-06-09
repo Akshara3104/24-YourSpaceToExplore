@@ -343,3 +343,15 @@ exports.makeAllRead=async(req, res)=>{
         return res.status(500).json({ success: false, message: "Server error" });
     }
 }
+
+
+exports.deleteAllNotifications=async(req, res)=>{
+    try {
+        const { userId } = req.body;
+        await NotificationModel.deleteMany({ userId });
+        return res.status(200).json({ success: true, message: "All notifications deleted" });
+    } catch (error) {
+        console.log(error.message)
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+}

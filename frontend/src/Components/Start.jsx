@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export default function Start() {
 
@@ -8,17 +9,16 @@ export default function Start() {
     return (
         <div className='p-4 h-screen bg-black'>
         <div className='h-full bg-neutral-800 rounded d-flex flex-col justify-center items-center gap-3'>
-            <div className='text-5xl font-semibold bg-gradient-to-r from-orange-500 via-pink-500 to-red-500 bg-clip-text text-transparent'>NQuery</div>
             <img
-                className='w-40 py-3'
-                style={{filter: 'invert(1)'}}
-                src='/images/Logo.png' 
+                className='w-40 shadowLog'
+                src='/images/Logo3.png' 
             />
-            <div className='text-2xl font-semibold bg-gradient-to-r from-orange-500 via-pink-500 to-red-500 bg-clip-text text-transparent'>Ask.Connect.Grow</div>
+            <div className='text-2xl font-semibold bg-gradient-to-r from-orange-500 via-pink-500 to-red-500 bg-clip-text text-transparent'>Your Space To Explore</div>
             <div className='d-flex'>
-                <button onClick={()=>navigate('/nquery')} className='text-xl rounded bg-gradient-to-r from-orange-500 to-red-500 px-4 py-2 m-2 hover:opacity-90'>Enter</button>
+                <button onClick={()=>navigate('/24')} className='text-xl rounded bg-gradient-to-r from-orange-500 to-red-500 px-4 py-2 m-2 hover:opacity-90'>Enter</button>
                 <button onClick={()=>navigate('/login')} className='text-xl rounded bg-gradient-to-r from-orange-500 to-red-500 px-4 py-2 m-2 hover:opacity-90'>Login</button>
             </div>
+            <FontAwesomeIcon className='w-20' icon="fa-solid fa-heart" style={{color: "#f97316",}} />
         </div>
         </div>
     )

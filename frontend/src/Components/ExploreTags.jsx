@@ -37,7 +37,7 @@ export default function ExploreTags() {
 						key={tag}
 						className="relative cursor-pointer rounded-lg overflow-hidden shadow-lg hover:scale-[1.05] transition"
 						style={{ aspectRatio: '4 / 3' }}
-						onClick={() => navigate(`/nquery/tag/${tag}`)}
+						onClick={() => navigate(`/24/tag/${tag}`)}
 					>
 						<img
 							src={`/images/${tag}.jpeg`}

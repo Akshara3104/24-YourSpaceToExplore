@@ -45,7 +45,7 @@ import NotLoggedIn from './NotLoggedIn';
                 <div
                 key={index}
                 className="flex items-center space-x-3 p-2 hover:bg-gradient-to-r from-orange-500 to-red-500 rounded-lg cursor-pointer hover:scale-105 transition"
-                onClick={()=>navigate(`/nquery/messages/${friend._id}`, 
+                onClick={()=>navigate(`/24/messages/${friend._id}`, 
                     {state:{targetName: friend.name, targetProfilePicture: friend.profilePicture}})}
                 >
                 <div className="relative">

@@ -68,7 +68,7 @@ export default function ExploreAccounts() {
                     <div
                         key={index}
                         className="flex items-start gap-4 p-4 bg-neutral-800 hover:bg-gradient-to-r from-orange-500 to-orange-500 rounded-xl shadow-md cursor-pointer transition my-2 hover:scale-[1.02]"
-                        onClick={() => navigate(`/nquery/${user.name}/profile`, {
+                        onClick={() => navigate(`/24/${user.name}/profile`, {
                             state: { targetId: user._id }
                         })}
                     >
@@ -98,7 +98,7 @@ export default function ExploreAccounts() {
                     <div
                         key={index}
                         className="flex items-start gap-4 p-4 bg-neutral-800 hover:bg-gradient-to-r from-orange-500 to-orange-500 rounded-xl shadow-md cursor-pointer transition my-2 hover:scale-[1.02]"
-                        onClick={() => navigate(`/nquery/community/${community._id}`, {
+                        onClick={() => navigate(`/24/community/${community._id}`, {
                         state: { communityId: community._id }
                         })}
                     >

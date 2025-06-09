@@ -115,7 +115,6 @@ exports.addComment = async (req, res)=>{
         
         await newComment.save()
 
-        console.log(fromId)
         const notification = new NotificationModel({
             userId: fromId,
             type: 'comment',
@@ -127,11 +126,20 @@ exports.addComment = async (req, res)=>{
 
         await notification.save()
 
-        console.log(notification)
         
-        return res.status(200).json({ success: true, message: 'Comment added' })
+        return res.status(200).json({ success: true, message: 'Comment added', commendId: newComment._id })
     } catch (error) {
-        console.log(error.message)
+        return res.status(500).json({ success: false, message: 'Error occured' })
+    }
+}
+
+
+exports.deleteComment = async(req, res)=>{
+    try {
+        const { commentId } = req.body
+        const deletedComment = await CommentModel.findByIdAndDelete(commentId);
+        return res.status(200).json({ success: true, message: 'Deleted' })
+    } catch (error) {
         return res.status(500).json({ success: false, message: 'Error occured' })
     }
 }

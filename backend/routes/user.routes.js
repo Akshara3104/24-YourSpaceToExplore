@@ -1,7 +1,7 @@
 
 
 const express = require('express');
-const { follow, unfollow, getMyProfile, getUserProfile, getConnections, search, fetchByTags, toggleFollow, editProfile, getNotifications, makeAllRead } = require('../controllers/user.controller');
+const { follow, unfollow, getMyProfile, getUserProfile, getConnections, search, fetchByTags, toggleFollow, editProfile, getNotifications, makeAllRead, deleteAllNotifications } = require('../controllers/user.controller');
 const router = express.Router();
 
 router.post('/follow', follow);
@@ -15,5 +15,6 @@ router.post('/toggleFollow', toggleFollow);
 router.post('/editProfile', editProfile);
 router.post('/getNotifications', getNotifications)
 router.post('/makeAllRead', makeAllRead)
+router.post('/deleteAllNotifications', deleteAllNotifications)
 
 module.exports = router;

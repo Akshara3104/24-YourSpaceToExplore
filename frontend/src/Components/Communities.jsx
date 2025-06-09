@@ -97,7 +97,6 @@ export default function Communities() {
             const res = await axios.post(process.env.REACT_APP_CLOUDINARY_API, data)
     
             if(res.data.url)    setPhotoUploaded(true)
-            console.log(res.data)
 
             setNewCommunity(prev=>{
                 return{
@@ -113,16 +112,24 @@ export default function Communities() {
                 alert('Please enter community title')
                 return
             }
-            console.log(newCommunity)
+            if(newCommunity.title.length>=30){
+                alert('Tttle length should be <30 characters')
+                return
+            }
+            if(newCommunity.description.length>300){
+                alert('Description length should be <300 characters')
+                return
+            }
+
             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/community/createCommunity`, {
                 newCommunity,
                 createdBy: userId,
             })
-            console.log(res.data)
+
             if(res.data.success){
                 toast('Community successfully created', toastSettings)
                 setTimeout(()=>{
-                    navigate(`/nquery/community/${res.data.communityId}`, {state: { communityId: res.data.communityId }})
+                    navigate(`/24/community/${res.data.communityId}`, {state: { communityId: res.data.communityId }})
                 }, 1500)
             }
         }
@@ -282,7 +289,7 @@ return (
             <div
             key={index}
             className="flex items-center space-x-3 p-2 hover:bg-gradient-to-r from-orange-500 to-red-500 rounded-lg cursor-pointer hover:scale-105 transition"
-            onClick={()=>navigate(`/nquery/communities/${community._id}/chat`, 
+            onClick={()=>navigate(`/24/communities/${community._id}/chat`, 
                     {state: {
                         communityId: community._id, 
                         communityTitle: community.title,

@@ -88,6 +88,32 @@ exports.getCommunityDetails = async (req, res)=>{
     }
 }
 
+exports.editProfile = async(req, res)=>{
+    try {
+        const { communityId, newData } = req.body
+
+        const community = await CommunityModel.findById(communityId)
+        console.log(community, newData)
+
+        community.title = newData.title
+        community.image = newData.image
+        community.description = newData.description
+        community.tags = newData.tags
+
+        await community.save()
+
+        return res.status(200).json({
+            success: true,
+            message: 'Edited'
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Error'
+        })
+    }
+}
+
 
 exports.joinCommunity = async (req, res) => {
 

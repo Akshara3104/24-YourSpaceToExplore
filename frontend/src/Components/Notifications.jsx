@@ -1,5 +1,6 @@
 import React from 'react'
 import axios from 'axios'
+import { Trash2 } from 'lucide-react'
 
 export default function Notifications() {
 
@@ -13,8 +14,7 @@ export default function Notifications() {
         try {
             const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/user/getNotifications`, { userId })
             setOpened(res.data.opened)
-            setNotOpened(res.data.notOpened)
-            console.log(res.data)   
+            setNotOpened(res.data.notOpened) 
         } catch (error) {
             console.log(error.message)
             return null
@@ -29,6 +29,15 @@ export default function Notifications() {
             return null
         }
     }
+    
+    const deleteAllNotifications = async()=>{
+        try {
+            const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/user/deleteAllNotifications`, { userId })
+            window.location.reload()
+        } catch (error) {
+            return null
+        }
+    }
 
     React.useEffect(()=>{
         getNotifications()
@@ -36,7 +45,7 @@ export default function Notifications() {
     }, [])
 
     return (
-        <div className="p-6 section h-full overflow-scroll">
+        <div className="p-6 section h-full overflow-scroll relative">
             <div className="flex justify-center my-4">
                 <h2 className="text-3xl font-semibold relative underline-orange">
                     Notifications
@@ -49,7 +58,6 @@ export default function Notifications() {
                 No notifications
             </div>
             :
-        
             <>
             <div className='w-50 mx-auto'>
             {notOpened.map((n, index) => (
@@ -110,6 +118,15 @@ export default function Notifications() {
             </div>
             </>
             }
+
+            <div className="absolute top-5 right-5">
+                <div 
+                    className="inline-flex items-center gap-2 rounded p-2 cursor-pointer hover:bg-gradient-to-r from-orange-500 to-red-500 bg-neutral-800"
+                    onClick={()=>deleteAllNotifications()}
+                >
+                    <Trash2  /> Delete All
+                </div>
+            </div>
         </div>
     )
 }

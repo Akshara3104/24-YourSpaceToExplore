@@ -36,7 +36,7 @@ export default function Login() {
                     localStorage.setItem('profilePicture', res.data.profilePicture)
                     setTimeout(()=>{
                         toast('Login successful', toastSettings)
-                        navigate('/nquery')
+                        navigate('/24')
                     }, 1500)
                 }else{
                     console.log(res.data.message)
