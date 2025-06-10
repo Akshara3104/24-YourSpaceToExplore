@@ -116,7 +116,7 @@ const PostModal = ({ isOpen, post, onClose, user, userId, name, profilePicture, 
                         </div>
 
                         {/* Delete Post Button - only visible if it's the user's post */}
-                        {(post.userId === userId) || (admin===userId) && (
+                        {((post.userId === userId) || (admin===userId)) && (
                             <div className="mt-auto pt-4 border-t border-zinc-700 flex justify-end">
                                 <button
                                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-md hover:from-orange-600 hover:to-red-700 transition-all duration-300"
