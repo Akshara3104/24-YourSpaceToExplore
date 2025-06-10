@@ -11,25 +11,25 @@ https://24-your-space-to-explore.vercel.app
 
 ## 🌟 Features
 
-* *User Profiles*
+* ## User Profiles
   Create personal profiles including career interests, bio, and more.
 
-* *Community Building*
+* ## Community Building
   Join or explore communities based on career paths.
 
-* *Mentorship & Messaging*
+* ## Mentorship & Messaging
   Chat with mentors and peers directly through an integrated messaging system.
 
-* *Post, Like & Comment*
+* ## Post, Like & Comment
   Share your thoughts, experiences, and engage with the community.
 
-* *Search Functionality*
+* ## Search Functionality
   Search users and communities with ease.
 
-* *Modern UI Design*
+* ## Modern UI Design
   Clean and user-friendly design, built for large screens.
 
-* *Cloudinary Integration*
+* ## Cloudinary Integration
   All images (including profile pictures and post images) are hosted securely on [Cloudinary](https://cloudinary.com/).
 
 ---
