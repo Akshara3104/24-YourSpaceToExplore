@@ -4,10 +4,9 @@
 
 ---
 
-
 ## Live demo
 
-https://24-your-space-to-explore.vercel.app
+[https://24-your-space-to-explore.vercel.app](https://24-your-space-to-explore.vercel.app)
 
 ## 🌟 Features
 
@@ -45,14 +44,14 @@ https://24-your-space-to-explore.vercel.app
 
 ### 1. Clone the Repository
 
-bash
+```bash
 git clone https://github.com/AbhiVardhan020/24-YourSpaceToExplore
 cd 24-YourSpaceToExplore
-
+```
 
 ### 2. Install Dependencies
 
-bash
+```bash
 # For backend
 cd backend
 npm install
@@ -60,28 +59,27 @@ npm install
 # For frontend
 cd ../frontend
 npm install
-
+```
 
 ### 3. Environment Variables
 
 Create a .env file in the frontend folder with the following variables:
 
-bash
+```bash
 REACT_APP_BACKEND_URL = http://localhost:3001
 REACT_APP_CLOUDINARY_API = your_api_key
 REACT_APP_CLOUD_NAME = your_cloudinary_cloud_name
-
+```
 
 Create a .env file in the backend folder with the following variables:
 
-bash
+```bash
 MONGODB_URL = your_mongodb_url
-
-
+```
 
 ### 4. Run the Project
 
-bash
+```bash
 # In one terminal for frontend
 cd frontend
 npm start
@@ -89,7 +87,7 @@ npm start
 # In another terminal for backend
 cd backend
 npm start
-
+```
 
 ### 5. Visit the App
 
